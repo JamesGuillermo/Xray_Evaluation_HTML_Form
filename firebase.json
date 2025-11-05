@@ -1,0 +1,23 @@
+{
+  "hosting": [
+    {
+      "target": "xray-evaluation",
+      "public": ".",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**",
+        "**/*.exe",
+        "**/*.bat",
+        "**/*.sh",
+        "**/*.ps1",
+        "**/*.cmd",
+        "**/npx",
+        "**/*.txt",
+        "**/*.md",
+        "**/Code.gs",
+        "**/Code.js"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,995 @@
+================================================================================
+🧪 TESTING AND TROUBLESHOOTING GUIDE
+================================================================================
+X-ray Machine Evaluation Form - Google Sheets Integration
+Comprehensive Testing & Debugging Reference
+================================================================================
+
+TABLE OF CONTENTS
+-----------------
+1. Pre-Deployment Testing Checklist
+2. Component-by-Component Testing
+3. Integration Testing
+4. User Acceptance Testing (UAT)
+5. Performance Testing
+6. Common Error Messages & Solutions
+7. Debugging Tools & Techniques
+8. Validation Scripts
+9. Data Integrity Checks
+10. Rollback Procedures
+
+================================================================================
+1. PRE-DEPLOYMENT TESTING CHECKLIST
+================================================================================
+
+Before going live, test each component:
+
+□ CSV FILE VALIDATION
+  □ File exists: Xray_Evaluation_Questions_Simple.csv
+  □ File encoding: UTF-8 with BOM
+  □ Headers match expected format
+  □ 28 data rows present
+  □ No empty cells in required columns
+  □ Special characters preserved (apostrophes, dashes)
+  □ Test with csv_validator.html
+
+□ GOOGLE SHEET SETUP
+  □ Sheet created and named correctly
+  □ Sheet ID obtained and saved
+  □ "Responses" tab exists
+  □ Sharing permissions set to "Anyone with link"
+  □ Headers ready (Row 1)
+  □ Test row can be added manually
+
+□ APPS SCRIPT DEPLOYMENT
+  □ Code.gs file pasted completely
+  □ SHEET_ID configured
+  □ SHEET_NAME matches tab name
+  □ testSheetAccess() passes
+  □ testFormSubmission() passes
+  □ Web app deployed with "Anyone" access
+  □ Web app URL obtained
+  □ GET request shows status page
+
+□ HTML FORM CONFIGURATION
+  □ index.html updated with web app URL
+  □ ENABLE_GOOGLE_SHEETS set to true
+  □ CSV_FILE_NAME matches actual file
+  □ Form loads without errors
+  □ All 28 questions render correctly
+  □ Progress bar functions
+
+□ NETWORK & ENVIRONMENT
+  □ Internet connection stable
+  □ Firewall allows Google API access
+  □ Browser supports modern JavaScript (ES6+)
+  □ Cookies and JavaScript enabled
+  □ Local server running if testing locally
+
+================================================================================
+2. COMPONENT-BY-COMPONENT TESTING
+================================================================================
+
+TEST 1: CSV FILE LOADING
+-------------------------
+Objective: Verify CSV file loads and parses correctly
+
+Steps:
+1. Open index.html in browser
+2. Open browser DevTools (F12)
+3. Check Console tab for messages
+4. Wait for form to load
+
+Expected Results:
+✓ "Loading questions from CSV file..." appears briefly
+✓ Form displays with all sections
+✓ Console shows: "Successfully loaded X rows"
+✓ All 28 questions visible
+✓ Machine specifications displayed
+
+Failure Indicators:
+✗ "Failed to load CSV file" error
+✗ Blank page after loading
+✗ Missing questions
+✗ Malformed question text
+
+Troubleshooting:
+→ Check CSV file is in same directory as index.html
+→ Use web server (not file:// protocol)
+→ Verify CSV_FILE_NAME constant matches actual filename
+→ Test with csv_validator.html first
+
+---
+
+TEST 2: FORM RENDERING
+-----------------------
+Objective: Verify all form elements render correctly
+
+Steps:
+1. Load the form
+2. Scroll through all sections
+3. Check each question
+
+Expected Results:
+✓ 9 distinct sections (categories)
+✓ 28 total questions
+✓ Each question has 3 machine rating cards
+✓ Each card has 6 radio buttons (0-5)
+✓ Progress bar at top
+✓ Reviewer info fields at top
+✓ Submit button at bottom
+
+Checklist per Question:
+□ Question number (Q1-Q28)
+□ Question text displayed
+□ Evaluation criteria shown
+□ Machine specifications visible for all 3 machines
+□ BullsEye rating card (blue)
+□ Aimed rating card (purple)
+□ GE rating card (pink)
+□ All radio buttons functional
+
+Troubleshooting:
+→ Check questionCounter variable increments correctly
+→ Verify MACHINES array has 3 entries
+→ Inspect browser console for JavaScript errors
+→ Check CSS is loading (styles applied)
+
+---
+
+TEST 3: FORM VALIDATION
+------------------------
+Objective: Verify client-side validation works
+
+Test 3A: Empty Submission
+Steps:
+1. Load fresh form
+2. Click "Submit Evaluation" without filling anything
+3. Observe result
+
+Expected Result:
+✓ Alert appears: "⚠️ Please fill in all required information"
+✓ Form does NOT submit
+✓ No network request made
+
+Test 3B: Partial Information
+Steps:
+1. Fill only Reviewer Name
+2. Leave Affiliation and Date empty
+3. Click Submit
+
+Expected Result:
+✓ Same validation alert appears
+✓ Form does NOT submit
+
+Test 3C: Complete Information
+Steps:
+1. Fill all three info fields
+2. Leave all ratings at default (0)
+3. Click Submit
+
+Expected Result:
+✓ Form DOES submit (0 is valid rating)
+✓ Submission proceeds to Google Sheets
+
+Test 3D: Progress Tracking
+Steps:
+1. Note initial progress: "0% Complete"
+2. Select one rating
+3. Check progress updates
+
+Expected Result:
+✓ Progress bar updates immediately
+✓ Percentage increases
+✓ Reaches 100% when all rated
+
+---
+
+TEST 4: GOOGLE APPS SCRIPT CONNECTION
+--------------------------------------
+Objective: Verify Apps Script is reachable and responding
+
+Test 4A: GET Request (Status Check)
+Steps:
+1. Copy your Apps Script web app URL
+2. Paste in browser address bar
+3. Press Enter
+
+Expected Result:
+✓ Page loads showing "✅ Apps Script is Active!"
+✓ Status information displayed
+✓ Sheet ID matches your sheet
+✓ Current server time shown
+
+Failure Result:
+✗ "Authorization needed" (script not deployed properly)
+✗ 404 Not Found (wrong URL)
+✗ Timeout (network issue)
+
+Test 4B: POST Request (Submission Test)
+Steps:
+1. Open Apps Script editor
+2. Run function: testFormSubmission()
+3. Check execution log
+4. Check Google Sheet
+
+Expected Result:
+✓ Log shows: "Test submission result: {status: success}"
+✓ New row appears in Google Sheet
+✓ Test data visible (all 3s)
+
+---
+
+TEST 5: DATA SUBMISSION FLOW
+-----------------------------
+Objective: Verify end-to-end submission works
+
+Steps:
+1. Load form in browser
+2. Fill reviewer information:
+   - Name: "Test Reviewer"
+   - Affiliation: "Test Hospital"
+   - Date: Today
+3. Rate all machines for all questions (use varied ratings)
+4. Note the timestamp before clicking Submit
+5. Click "Submit Evaluation"
+6. Observe loading state
+7. Wait for confirmation
+8. Switch to Google Sheet tab
+9. Refresh the sheet
+
+Expected Results:
+✓ Button changes to "⏳ Saving to Google Sheets..."
+✓ Button is disabled during submission
+✓ After 2-5 seconds: "✅ Evaluation Saved Successfully!" alert
+✓ Form resets after confirmation
+✓ Progress bar returns to 0%
+✓ New row appears in Google Sheet (may need refresh)
+✓ Timestamp is within last minute
+✓ All data matches what you entered
+✓ Totals calculated correctly
+
+Failure Scenarios:
+✗ Timeout after 30+ seconds → Network issue or script error
+✗ "Error Saving to Google Sheets" → See Section 6 for causes
+✗ No data in sheet → Check sheet ID, deployment status
+✗ Wrong data in sheet → Column mapping issue
+
+================================================================================
+3. INTEGRATION TESTING
+================================================================================
+
+TEST 6: CONCURRENT SUBMISSIONS
+-------------------------------
+Objective: Verify multiple users can submit simultaneously
+
+Setup:
+- Open form in 3 different browser tabs/windows
+- Or have 3 different people submit
+
+Steps:
+1. All users fill out forms with different data
+2. User A submits
+3. User B submits 5 seconds later
+4. User C submits 5 seconds after that
+5. Check Google Sheet
+
+Expected Results:
+✓ All 3 submissions appear as separate rows
+✓ No data overlap or corruption
+✓ Timestamps reflect submission order
+✓ Each row has correct data for respective user
+
+---
+
+TEST 7: NETWORK INTERRUPTION
+-----------------------------
+Objective: Test graceful handling of network issues
+
+Test 7A: Disconnect During Submission
+Steps:
+1. Fill out form completely
+2. Disconnect internet/wifi
+3. Click Submit
+4. Observe result
+
+Expected Result:
+✓ After timeout: "❌ Error Saving to Google Sheets"
+✓ Offers to download JSON backup
+✓ Data not lost
+✓ Form remains filled
+
+Test 7B: Slow Connection
+Steps:
+1. Throttle network to "Slow 3G" in DevTools
+2. Submit form
+3. Wait patiently
+
+Expected Result:
+✓ Takes longer but eventually succeeds
+✓ Or times out gracefully with error message
+
+---
+
+TEST 8: BROWSER COMPATIBILITY
+------------------------------
+Objective: Verify cross-browser functionality
+
+Test on each browser:
+□ Google Chrome (latest)
+□ Mozilla Firefox (latest)
+□ Microsoft Edge (latest)
+□ Safari (macOS/iOS)
+□ Mobile Chrome (Android)
+□ Mobile Safari (iOS)
+
+For each browser, verify:
+□ Form loads and displays correctly
+□ CSV parses successfully
+□ Radio buttons work
+□ Form submits successfully
+□ Confirmation appears
+□ Data saves to Google Sheet
+
+Known Compatibility:
+✓ Modern browsers (Chrome 90+, Firefox 88+, Edge 90+, Safari 14+)
+✗ Internet Explorer (not supported - lacks ES6 support)
+
+---
+
+TEST 9: DATA INTEGRITY
+-----------------------
+Objective: Verify data is stored accurately
+
+Steps:
+1. Create a test form with specific pattern:
+   - Q1-Q5: All BullsEye=5, Aimed=3, GE=1
+   - Q6-Q10: All BullsEye=1, Aimed=3, GE=5
+   - Q11-Q28: All = 2
+2. Submit this pattern
+3. In Google Sheet, manually verify random samples
+
+Verification Checklist:
+□ Timestamp accurate (within 1 minute of submission)
+□ Reviewer name matches exactly
+□ Affiliation matches exactly
+□ Review date matches exactly
+□ Q1 BullsEye = 5 (Column E)
+□ Q1 Aimed = 3 (Column F)
+□ Q1 GE = 1 (Column G)
+□ Q10 GE = 5 (Column AH)
+□ Q20 all = 2 (Columns BJ, BK, BL)
+□ BullsEye Total = calculated correctly
+□ Aimed Total = calculated correctly
+□ GE Total = calculated correctly
+□ Grand Total = sum of three machine totals
+
+Manual Calculation:
+- Q1-Q5: 5+1+1+1+1 = 9 (BullsEye) × 5 = 45... wait, pattern × 5 questions
+- Easier: Use calculator to verify formulas
+- BullsEye should be: 5+5+5+5+5 + 1+1+1+1+1 + 2×18 = 25+5+36 = 66
+- Verify sheet matches manual calculation
+
+================================================================================
+4. USER ACCEPTANCE TESTING (UAT)
+================================================================================
+
+TEST 10: END-USER WORKFLOW
+---------------------------
+Objective: Real users can successfully use the form
+
+Participants: 2-3 actual intended users (doctors, technicians, etc.)
+
+Scenario:
+"You've been asked to evaluate three X-ray machines. Use this form to rate each machine on various criteria."
+
+Observe:
+□ Can they find the form?
+□ Do they understand the instructions?
+□ Can they fill out the reviewer info easily?
+□ Do they understand the rating scale (0-5)?
+□ Can they navigate through all questions?
+□ Do they notice the progress bar?
+□ Do they successfully submit?
+□ Do they understand the confirmation message?
+
+Collect Feedback:
+- What was confusing?
+- What was easy?
+- How long did it take?
+- Any suggestions for improvement?
+
+Target Metrics:
+✓ Time to complete: 15-25 minutes
+✓ Success rate: 100% (all users submit successfully)
+✓ Satisfaction: "Easy" or "Very Easy"
+✓ Confusion points: < 2 per user
+
+---
+
+TEST 11: DATA ANALYSIS WORKFLOW
+--------------------------------
+Objective: Verify collected data is usable for decision-making
+
+Steps:
+1. Collect 5+ test submissions with varied ratings
+2. Open Google Sheet
+3. Try to answer these questions using the data:
+   - Which machine has the highest average score?
+   - Which category (e.g., Speed) scored best for each machine?
+   - How consistent are the ratings across reviewers?
+   - Are there any questions where all machines scored low?
+
+Expected Results:
+✓ Data is organized clearly in columns
+✓ Totals calculate automatically
+✓ Can create pivot tables easily
+✓ Can generate charts from data
+✓ Can export to Excel if needed
+
+If difficult:
+→ Add summary sheet with calculations
+→ Create pivot table template
+→ Add conditional formatting for easy reading
+
+================================================================================
+5. PERFORMANCE TESTING
+================================================================================
+
+TEST 12: FORM LOADING SPEED
+----------------------------
+Objective: Verify acceptable load times
+
+Measurement Points:
+1. Time from clicking index.html to seeing "Loading..." message
+2. Time from "Loading..." to fully rendered form
+3. Time from Submit click to confirmation message
+
+Tools:
+- Browser DevTools → Network tab
+- Browser DevTools → Performance tab
+- Stopwatch
+
+Benchmarks:
+✓ Initial load: < 2 seconds
+✓ CSV parse and render: < 3 seconds
+✓ Total time to usable form: < 5 seconds
+✓ Submission to confirmation: < 5 seconds
+
+If slower:
+→ Check network speed
+→ Verify PapaParse CDN is accessible
+→ Consider using embedded PapaParse (index_offline.html approach)
+
+---
+
+TEST 13: LARGE DATASET PERFORMANCE
+-----------------------------------
+Objective: Verify Google Sheet handles many responses
+
+Stress Test:
+1. Use testFormSubmission() in Apps Script
+2. Run it 50 times (or modify to loop)
+3. Check sheet performance
+
+Steps:
+1. In Apps Script, modify testFormSubmission():
+   ```javascript
+   function stressTest() {
+     for (let i = 0; i < 50; i++) {
+       testFormSubmission();
+       Utilities.sleep(1000); // 1 second between submissions
+     }
+   }
+   ```
+2. Run stressTest()
+3. Wait for completion
+4. Open Google Sheet
+
+Expected Results:
+✓ All 50 rows added successfully
+✓ No duplicate rows
+✓ Formulas calculate correctly in all rows
+✓ Sheet remains responsive
+✓ Can scroll and filter easily
+
+Performance Limits:
+- Google Sheets: 10 million cells max
+- With 91 columns: ~109,000 rows possible
+- Realistic usage: 5,000-10,000 submissions easily supported
+
+================================================================================
+6. COMMON ERROR MESSAGES & SOLUTIONS
+================================================================================
+
+ERROR: "Failed to load CSV file"
+---------------------------------
+Symptoms:
+- Red error box on page load
+- Form doesn't appear
+- Console shows fetch error
+
+Causes & Solutions:
+
+1. CORS Issue (most common)
+   Symptom: "CORS policy: No 'Access-Control-Allow-Origin' header"
+   Solution: Use a web server (http://), not file:// protocol
+   → Run start_server.bat (Windows)
+   → Or use: python -m http.server 8000
+   → Or use index_offline.html with file upload
+
+2. File Not Found
+   Symptom: "404 Not Found"
+   Solution: Check file exists in same folder as index.html
+   → Verify filename matches CSV_FILE_NAME constant
+   → Check for typos in filename
+
+3. Wrong Path
+   Symptom: File exists but still not found
+   Solution: Ensure CSV is in SAME directory as index.html
+   → Not in a subfolder
+   → Not in parent folder
+
+4. File Permissions
+   Symptom: "Permission denied"
+   Solution: Check file read permissions
+   → Right-click file → Properties → Security
+   → Ensure "Read" is allowed
+
+---
+
+ERROR: "❌ Error Saving to Google Sheets"
+------------------------------------------
+Symptoms:
+- Form submits but shows error alert
+- Data doesn't appear in Google Sheet
+- Console shows network error
+
+Causes & Solutions:
+
+1. Invalid Web App URL
+   Symptom: 404 error in console
+   Solution: Verify GOOGLE_SCRIPT_URL in index.html
+   → Must end with "/exec"
+   → Copy from Apps Script deployment page
+   → No trailing spaces
+
+2. Apps Script Not Deployed
+   Symptom: "Authorization needed" or redirect to login
+   Solution: Deploy (or re-deploy) Apps Script as web app
+   → Apps Script → Deploy → New deployment
+   → Type: Web app
+   → Access: Anyone
+   → Copy new URL
+
+3. Wrong Permissions
+   Symptom: "You need permission" message
+   Solution: Change web app access to "Anyone"
+   → Apps Script → Deploy → Manage deployments
+   → Click edit (pencil icon)
+   → Who has access: Anyone
+   → Update
+
+4. Network Connectivity
+   Symptom: "Failed to fetch" or timeout
+   Solution: Check internet connection
+   → Try opening script.google.com in browser
+   → Check firewall settings
+   → Try different network
+
+5. Script Runtime Error
+   Symptom: Returns {status: 'error'} with message
+   Solution: Check Apps Script execution log
+   → Apps Script → View → Execution log
+   → Look for red error messages
+   → Common: Wrong SHEET_ID, sheet not found
+
+---
+
+ERROR: "Missing required fields"
+---------------------------------
+Symptom: Can't submit even with all fields filled
+Cause: Validation logic issue
+
+Solutions:
+1. Check browser console for JavaScript errors
+2. Verify all input fields have correct 'name' attributes
+3. Test in different browser
+4. Clear browser cache and reload
+
+---
+
+ERROR: #REF! in Google Sheet totals
+------------------------------------
+Symptom: Total columns show #REF! instead of numbers
+Cause: Formula references non-existent cells
+
+Solutions:
+1. Check formula references correct column range
+2. Verify all rating columns exist (E through CL)
+3. Delete row and let Code.gs recreate with correct formulas
+4. Manually fix formula: =SUMPRODUCT((MOD(COLUMN(E2:CJ2)-COLUMN(E2),3)=0)*(E2:CJ2))
+
+---
+
+ERROR: Data in wrong columns
+-----------------------------
+Symptom: Ratings appear shifted or in wrong order
+Cause: Header row doesn't match Code.gs expectations
+
+Solutions:
+1. Delete all rows including header
+2. Submit a test - Code.gs will recreate proper headers
+3. Or manually verify headers match GOOGLE_SHEET_SETUP.txt exactly
+4. Check for extra spaces in header names
+
+================================================================================
+7. DEBUGGING TOOLS & TECHNIQUES
+================================================================================
+
+TOOL 1: Browser DevTools Console
+---------------------------------
+How to Open:
+- Windows/Linux: F12 or Ctrl+Shift+I
+- Mac: Cmd+Option+I
+- Or right-click → Inspect → Console tab
+
+What to Look For:
+□ Red error messages (JavaScript errors)
+□ Yellow warnings (non-critical issues)
+□ Network requests (see if CSV loaded, if POST succeeded)
+□ Console.log messages from the code
+
+Useful Console Commands:
+```javascript
+// Check if CSV loaded
+console.log(questionCounter); // Should be 28
+
+// Check configuration
+console.log(GOOGLE_SCRIPT_URL);
+console.log(ENABLE_GOOGLE_SHEETS);
+
+// Check form data before submit
+const formData = new FormData(document.getElementById('reviewForm'));
+for(let [k,v] of formData) console.log(k, v);
+```
+
+---
+
+TOOL 2: Network Tab
+--------------------
+Shows all network requests made by the page
+
+How to Use:
+1. Open DevTools → Network tab
+2. Reload page
+3. Watch requests
+
+Key Requests to Verify:
+□ index.html (200 OK)
+□ papaparse.min.js from CDN (200 OK)
+□ Xray_Evaluation_Questions_Simple.csv (200 OK)
+□ After submit: POST to script.google.com (200 OK or Opaque response)
+
+Understanding Responses:
+- 200 OK = Success
+- 404 Not Found = File doesn't exist at that path
+- 0 (Opaque) = CORS mode, normal for Apps Script POST
+
+---
+
+TOOL 3: Apps Script Execution Log
+----------------------------------
+Shows what happens in your Apps Script
+
+How to Access:
+1. Open Apps Script editor
+2. View → Executions
+3. Or View → Logs after running a function
+
+What to Look For:
+□ "Received POST request" = Form successfully sent data
+□ "Successfully added row to sheet" = Data saved
+□ Red error icon = Something failed
+□ Execution time < 5 seconds = Normal performance
+
+Common Log Messages:
+✓ "Successfully accessed sheet: Responses" (testSheetAccess)
+✓ "Test submission result: {status: success}" (testFormSubmission)
+✗ "Error: Missing required fields" (validation failed)
+✗ "Error: Exception: Invalid argument" (wrong SHEET_ID)
+
+---
+
+TOOL 4: CSV Validator
+----------------------
+Use the included csv_validator.html tool
+
+Steps:
+1. Open csv_validator.html in browser
+2. Upload Xray_Evaluation_Questions_Simple.csv
+3. Review results
+
+What It Checks:
+□ File is valid CSV format
+□ Has correct number of rows (28)
+□ Has required columns (6 columns)
+□ Column headers match expected names
+□ No empty required cells
+
+---
+
+TOOL 5: Manual Data Inspection
+-------------------------------
+Sometimes the old-fashioned way works best
+
+Google Sheet:
+- Scroll through data rows
+- Check a few cells manually
+- Verify formulas with calculator
+- Compare to form submission screenshots
+
+CSV File:
+- Open in Notepad or VS Code
+- Verify encoding (should be UTF-8)
+- Check for hidden characters
+- Count rows (should be 29: 1 header + 28 data)
+
+================================================================================
+8. VALIDATION SCRIPTS
+================================================================================
+
+Here are quick validation scripts to run in browser console:
+
+SCRIPT 1: Verify All Questions Loaded
+--------------------------------------
+```javascript
+const questions = document.querySelectorAll('.question');
+console.log('Total questions:', questions.length);
+// Should output: Total questions: 28
+if (questions.length !== 28) {
+  console.error('❌ Expected 28 questions!');
+} else {
+  console.log('✓ Correct number of questions');
+}
+```
+
+SCRIPT 2: Verify All Rating Inputs
+-----------------------------------
+```javascript
+const radioButtons = document.querySelectorAll('input[type="radio"]');
+console.log('Total radio buttons:', radioButtons.length);
+// Should be: 28 questions × 3 machines × 6 options = 504
+if (radioButtons.length !== 504) {
+  console.error('❌ Expected 504 radio buttons!');
+} else {
+  console.log('✓ Correct number of radio buttons');
+}
+```
+
+SCRIPT 3: Count Rating Groups
+------------------------------
+```javascript
+const groups = {};
+document.querySelectorAll('input[type="radio"]').forEach(r => {
+  groups[r.name] = true;
+});
+console.log('Total rating groups:', Object.keys(groups).length);
+// Should be: 28 × 3 = 84 groups
+```
+
+SCRIPT 4: Check Configuration
+------------------------------
+```javascript
+console.log('CSV File:', CSV_FILE_NAME);
+console.log('Script URL:', GOOGLE_SCRIPT_URL);
+console.log('Sheets Enabled:', ENABLE_GOOGLE_SHEETS);
+console.log('Machines:', MACHINES);
+
+if (GOOGLE_SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE') {
+  console.error('❌ Google Script URL not configured!');
+} else {
+  console.log('✓ Google Script URL configured');
+}
+```
+
+SCRIPT 5: Simulate Submission Data
+-----------------------------------
+```javascript
+// Generate test data object
+const testData = {
+  reviewer_name: 'Console Test',
+  affiliation: 'Debug Hospital',
+  review_date: new Date().toISOString().split('T')[0],
+  ratings: {}
+};
+
+for (let q = 1; q <= 28; q++) {
+  testData.ratings[`q${q}_bullseye`] = 3;
+  testData.ratings[`q${q}_aimed`] = 3;
+  testData.ratings[`q${q}_ge`] = 3;
+}
+
+console.log('Test data:', JSON.stringify(testData, null, 2));
+console.log('Total ratings:', Object.keys(testData.ratings).length); // Should be 84
+```
+
+================================================================================
+9. DATA INTEGRITY CHECKS
+================================================================================
+
+After collecting real data, periodically verify integrity:
+
+CHECK 1: No Missing Timestamps
+-------------------------------
+In Google Sheet:
+1. Select column A (Timestamp)
+2. Look for any blank cells
+3. If found: Data submission failed for that row
+
+CHECK 2: All Ratings Are Numbers 0-5
+-------------------------------------
+In Google Sheet:
+1. Select rating columns (E through CL)
+2. Data → Data validation → Show warning (already set)
+3. Look for any cells with text or numbers > 5
+4. If found: Validation bypassed somehow
+
+CHECK 3: Totals Calculate Correctly
+------------------------------------
+Pick a random row and manually verify:
+1. Note the totals in columns CM, CN, CO
+2. Use calculator to sum the corresponding ratings
+3. Should match exactly
+
+Example:
+If BullsEye Total (CM) shows 87:
+- Sum columns E, H, K, N, Q, T, W, Z, AC, AF, AI, AL, AO, AR, AU, AX, BA, BD, BG, BJ, BM, BP, BS, BV, BY, CB, CE, CH
+- Should equal 87
+
+CHECK 4: No Duplicate Submissions
+----------------------------------
+Look for:
+- Same reviewer name
+- Same timestamp (within seconds)
+- Identical ratings
+
+If found:
+- May indicate double-submission bug
+- Or two people with same name (rare but possible)
+
+CHECK 5: Reasonable Rating Distribution
+----------------------------------------
+Statistical check:
+- If 90%+ of all ratings are 0 or 5: Suspicious (not using scale properly)
+- If all ratings identical across rows: Copy-paste error
+- Expected: Bell curve distribution with most ratings 2-4
+
+================================================================================
+10. ROLLBACK PROCEDURES
+================================================================================
+
+If something goes seriously wrong:
+
+SCENARIO 1: Bad Data in Google Sheet
+-------------------------------------
+Solution: Delete bad rows
+1. Identify affected rows
+2. Right-click row number → Delete row
+3. Or use clearAllResponses() function in Code.gs (deletes ALL data)
+
+SCENARIO 2: Apps Script Broken
+-------------------------------
+Solution: Restore previous version
+1. Apps Script → File → Version history
+2. Select working version
+3. Click "Restore"
+4. Re-deploy as web app
+
+SCENARIO 3: Form Not Working
+-----------------------------
+Solution: Use previous index.html version
+1. If using version control: git checkout previous version
+2. If not: Keep backup copies of working files
+3. Replace current index.html with backup
+
+SCENARIO 4: Lost Submissions
+-----------------------------
+Prevention: Enable email notifications
+1. In Code.gs: SEND_EMAIL_NOTIFICATIONS = true
+2. Each submission sends confirmation email
+3. Emails serve as backup
+
+Recovery:
+- Check browser console logs (may have submitted data)
+- Check Apps Script execution log
+- Ask users to resubmit if necessary
+
+SCENARIO 5: Google Sheet Accidentally Deleted
+----------------------------------------------
+Recovery:
+1. Google Drive → Trash
+2. Find deleted sheet
+3. Right-click → Restore
+4. Verify SHEET_ID still matches Code.gs
+
+SCENARIO 6: Need to Start Over
+-------------------------------
+Complete reset:
+1. Delete all rows in Google Sheet (keep header)
+2. Or create new sheet tab and update SHEET_NAME
+3. Clear browser cache (Ctrl+Shift+Delete)
+4. Test with fresh submission
+
+================================================================================
+✅ TESTING COMPLETION CHECKLIST
+================================================================================
+
+Before declaring "ready for production":
+
+□ All pre-deployment tests passed
+□ CSV loads correctly every time
+□ Form renders properly in all target browsers
+□ Validation prevents incomplete submissions
+□ Progress bar updates correctly
+□ Apps Script GET request shows status page
+□ Apps Script POST request receives and saves data
+□ Test submissions appear in Google Sheet correctly
+□ Totals calculate automatically and accurately
+□ Error handling tested (network issues, bad URLs)
+□ 3+ end users successfully tested and provided feedback
+□ Performance acceptable (< 5 seconds to submit)
+□ Concurrent submissions tested (no data corruption)
+□ Rollback procedure documented and tested
+□ Support team trained on troubleshooting
+□ Documentation complete and accessible
+□ Backup/recovery plan established
+
+================================================================================
+📊 TESTING LOG TEMPLATE
+================================================================================
+
+Use this template to track your testing:
+
+Date: _____________
+Tester: _____________
+Environment: □ Local  □ Firebase  □ Other: _____________
+Browser: _____________
+
+Test Results:
+[ ] CSV Loading - PASS / FAIL - Notes: _____________
+[ ] Form Rendering - PASS / FAIL - Notes: _____________
+[ ] Validation - PASS / FAIL - Notes: _____________
+[ ] Submission - PASS / FAIL - Notes: _____________
+[ ] Data in Sheet - PASS / FAIL - Notes: _____________
+[ ] Totals Correct - PASS / FAIL - Notes: _____________
+
+Issues Found:
+1. _____________________________________________
+2. _____________________________________________
+3. _____________________________________________
+
+Overall Status: □ Ready for Production  □ Needs Work
+
+Sign-off: _____________
+
+================================================================================
+🎯 FINAL RECOMMENDATION
+================================================================================
+
+Complete ALL tests in Sections 1-5 before going live.
+
+For each deployment environment (dev, staging, production):
+- Run full test suite
+- Document results
+- Get sign-off from stakeholder
+
+For ongoing operation:
+- Test weekly with sample submission
+- Monitor Google Sheet for anomalies
+- Review Apps Script execution logs monthly
+- Collect user feedback continuously
+
+Remember: Testing is not a one-time activity. Continuous monitoring ensures long-term reliability.
+
+================================================================================

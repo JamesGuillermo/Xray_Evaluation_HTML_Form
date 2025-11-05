@@ -1,0 +1,32 @@
+# Documentation
+*.txt
+*.md
+
+# Backend
+Code.gs
+Code.js
+
+# Git
+.git
+.gitignore
+
+# Backups
+*.bak
+*.old
+
+# Executable files (forbidden on Spark plan)
+*.exe
+*.bat
+*.sh
+*.ps1
+*.cmd
+
+# Node modules and dependencies
+node_modules/
+package-lock.json
+package.json
+
+# Firebase files
+.firebaserc
+firebase.json
+.firebase/

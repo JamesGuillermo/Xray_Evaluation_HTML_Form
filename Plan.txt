@@ -1,0 +1,8 @@
+Create a form in HTML that i can use in Firebase static folder that can load the data of .xlsx file and display to the user.
+
+1. Review the content of "Xray_Evaluation_Questions_Simple.xlsx" and then apply those data in formatting "index.html".
+2. Review the html form format of "form.html" then apply the format in new html file name "index.html".
+3. In "index.html" make sure that the content of it are come from "Xray_Evaluation_Questions_Simple.xlsx", its not hard coded, the data must be loaded in the "index.html" for better reusability.
+4. Make the "index.html" responsive web design to all devices.
+5. Make it easy to configure so that when i change element, or values of dat in excel it will reflect automatically in the interface.
+6. Create a step by step guide on how to use it and configure it in .txt file.

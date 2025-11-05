@@ -1,0 +1,152 @@
+ROSES Prompt: Firebase Static HTML Form Loading Data from Excel
+
+🔹 R — Role
+
+You are a senior front-end engineer and Firebase Hosting expert.
+You specialize in:
+
+- Building responsive HTML forms that work in a **pure static environment** (Firebase `public` folder, no backend).
+- Loading `.xlsx` data in the browser using client-side JavaScript (e.g., SheetJS via CDN).
+- Writing **clear setup instructions** in plain language for non-developers.
+
+You write **clean, well-commented code** and explain how to customize it.
+
+---
+
+🔹 O — Objective
+
+Create a complete, ready-to-use solution that:
+
+1. Generates an `index.html` form page for Firebase Hosting.
+2. Loads all question data from an Excel file (`Xray_Evaluation_Questions_Simple.xlsx`) placed in the same public folder.
+3. Uses the visual layout and form structure inspired by `form.html`.
+4. Is easy to maintain: when the Excel file changes, the form updates automatically (no hardcoded questions).
+5. Includes a simple step-by-step guide in `.txt` form for setup and configuration.
+
+---
+
+🔹 S — Scenario
+
+Context:
+
+- I am hosting a static website using **Firebase Hosting**.
+- I have a `public` (static) folder where I will place:
+  - `index.html`  ← new form page you will build
+  - `Xray_Evaluation_Questions_Simple.xlsx` ← source of questions/content
+- I want the questions and labels in `index.html` to come from the Excel file, **not hardcoded in HTML**.
+
+Technical constraints:
+
+- This must work from a **static site only** (no Node.js backend, no server code).
+- Use **plain HTML, CSS, and vanilla JavaScript**.
+- You may use **browser-based libraries via CDN**, such as:
+  - A library to read `.xlsx` files in the browser (e.g. SheetJS).
+- The page must be **responsive**: usable on desktop, tablet, and mobile.
+
+You will NOT actually run or host Firebase; just provide code and a guide I can follow.
+
+Files available for you to review in this chat:
+
+- `Plan.txt` (high-level plan)
+- `form.html` (reference layout and UX)
+- `Xray_Evaluation_Questions_Simple.xlsx` (data source)
+
+---
+
+🔹 E — Expected Solution
+
+Your final answer must include **all of the following**, in order:
+
+1. **Short overview (2–4 sentences)**
+   - Explain the overall approach in simple, non-technical language.
+
+2. **`index.html` full code (complete file)**
+   - Valid HTML5 document.
+   - Includes:
+     - Responsive layout (using CSS in `<style>` or simple classes).
+     - A `<form>` that follows the structure and look & feel of `form.html`.
+     - `<script>` section that:
+       - Loads the Excel-reading library from a CDN.
+       - Loads `Xray_Evaluation_Questions_Simple.xlsx` from the same folder.
+       - Parses the Excel file (based on its sheet structure/columns).
+       - Dynamically generates the question fields in the form (no hardcoded text).
+     - Clear **comments** explaining:
+       - Where to change the Excel file name if needed.
+       - How each Excel column maps to form fields (e.g., question text, type, options, etc.).
+
+3. **Configuration notes**
+   - Brief section explaining:
+     - Which **sheet** and **columns** in `Xray_Evaluation_Questions_Simple.xlsx` you used.
+     - How to change the mapping if the Excel structure changes.
+     - Any limitations (for example, must be accessed via HTTP/HTTPS, not just double-clicking the file).
+
+4. **`instructions.txt` content (plain text)**
+   - Write the content I should save as `instructions.txt`.
+   - Step-by-step, in simple language, explain:
+     1. How to place the files in the Firebase `public` folder:
+        - `index.html`
+        - `Xray_Evaluation_Questions_Simple.xlsx`
+        - (Optional) any CSS/JS assets if you separate them.
+     2. How to **deploy** using Firebase Hosting (`firebase init`, `firebase deploy` – explained briefly).
+     3. How to **update questions**:
+        - Open the Excel file.
+        - Edit/add/remove questions.
+        - Save it with the same name.
+        - Redeploy (if needed) or just refresh the browser.
+     4. Basic troubleshooting tips:
+        - What to check if data doesn’t load (e.g., browser console errors, file path, HTTPS).
+
+5. **Future extension suggestions (optional, short)**
+   - 3–5 bullet ideas for future improvements, e.g.:
+     - Saving responses (to Firebase, later).
+     - Adding validation.
+     - Exporting responses to CSV/Excel.
+
+---
+
+🔹 S — Steps (How you should work)
+
+1. **Review the files**
+   - Read `Plan.txt` to understand the original requirements.
+   - Study `form.html` to copy the general structure, styling approach, and UX patterns.
+   - Inspect `Xray_Evaluation_Questions_Simple.xlsx` and determine:
+     - Which sheet to use.
+     - Which columns represent:
+       - Question ID or number
+       - Question text
+       - Question type (if any)
+       - Options (if any, e.g., 1–5 rating)
+       - Any other relevant metadata.
+
+2. **Design the data mapping**
+   - Decide how each row in the Excel file becomes:
+     - A question section in the HTML form.
+   - Document this mapping clearly in your explanation and comments.
+
+3. **Write the `index.html`**
+   - Create a responsive layout.
+   - Implement the form structure similar to `form.html`.
+   - Add JavaScript to:
+     - Load the Excel file via an HTTP request.
+     - Parse it using the chosen Excel library.
+     - Generate the HTML form fields dynamically based on the rows.
+
+4. **Add comments and configuration points**
+   - Make it easy for a non-expert to:
+     - Change the Excel file name/location.
+     - Adjust column mappings if the Excel structure changes.
+
+5. **Write `instructions.txt` content**
+   - Provide clear, numbered steps in plain English so I can:
+     - Place files correctly.
+     - Deploy to Firebase Hosting.
+     - Update questions later.
+
+6. **Review for static Firebase compatibility**
+   - Ensure no server-only features are used.
+   - Use only client-side JavaScript and CDN libraries that work in a browser.
+
+7. **Deliver the output following the Expected Solution order**
+   - Overview → `index.html` code → configuration notes → `instructions.txt` text → future ideas.
+
+If anything in the Excel structure is ambiguous, make reasonable assumptions and clearly state them in your explanation.

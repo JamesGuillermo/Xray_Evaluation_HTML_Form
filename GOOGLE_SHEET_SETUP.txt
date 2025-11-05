@@ -1,0 +1,381 @@
+================================================================================
+📊 GOOGLE SHEET SETUP GUIDE
+================================================================================
+X-ray Machine Evaluation Form - Response Collection Sheet
+Based on: Xray_Evaluation_Questions_Simple.csv (28 questions, 3 machines)
+================================================================================
+
+TABLE OF CONTENTS
+-----------------
+1. Quick Start Checklist
+2. Sheet Structure Overview
+3. Detailed Column Layout
+4. Creating Your Sheet (Step-by-Step)
+5. Adding Formulas for Totals
+6. Formatting Recommendations
+7. Sample Data Example
+8. Analysis & Reporting Tips
+9. Troubleshooting
+
+================================================================================
+1. QUICK START CHECKLIST
+================================================================================
+
+□ Create a new Google Sheet
+□ Name it: "Xray_Machine_Evaluations" (or your preferred name)
+□ Create a sheet/tab named: "Responses"
+□ Copy the Sheet ID from the URL
+□ Add headers (see Section 4)
+□ Add total formulas (see Section 5)
+□ Format headers (optional but recommended)
+□ Test with sample data
+
+================================================================================
+2. SHEET STRUCTURE OVERVIEW
+================================================================================
+
+Your Google Sheet will have the following structure:
+
+┌─────────────────────────────────────────────────────────────────┐
+│ ROW 1: HEADERS                                                  │
+├─────────────────────────────────────────────────────────────────┤
+│ ROW 2+: DATA (one submission per row)                           │
+└─────────────────────────────────────────────────────────────────┘
+
+TOTAL COLUMNS: 91
+-----------------
+• 4 Information Columns (Timestamp, Name, Affiliation, Date)
+• 84 Rating Columns (28 questions × 3 machines)
+• 3 Machine Total Columns (sum per machine)
+• 1 Grand Total Column (overall sum)
+
+COLUMN GROUPS:
+--------------
+A-D   : Submission Information (4 columns)
+E-CL  : Question Ratings (84 columns)
+CM-CO : Machine Totals (3 columns)
+CP    : Grand Total (1 column)
+
+================================================================================
+3. DETAILED COLUMN LAYOUT
+================================================================================
+
+INFORMATION SECTION (Columns A-D)
+----------------------------------
+A: Timestamp           - Auto-generated submission time
+B: Reviewer Name       - Who filled the form
+C: Affiliation         - Hospital/Organization name
+D: Review Date         - Date of the review
+
+RATINGS SECTION (Columns E-CL) - Pattern repeats for all 28 questions
+----------------------------------------------------------------------
+For each question (Q1 through Q28), there are 3 columns:
+
+Pattern for Question N:
+  Column X+0: QN BullsEye  (Rating 0-5)
+  Column X+1: QN Aimed     (Rating 0-5)
+  Column X+2: QN GE        (Rating 0-5)
+
+Detailed Breakdown:
+
+Q1:  E=Q1 BullsEye, F=Q1 Aimed, G=Q1 GE
+Q2:  H=Q2 BullsEye, I=Q2 Aimed, J=Q2 GE
+Q3:  K=Q3 BullsEye, L=Q3 Aimed, M=Q3 GE
+Q4:  N=Q4 BullsEye, O=Q4 Aimed, P=Q4 GE
+Q5:  Q=Q5 BullsEye, R=Q5 Aimed, S=Q5 GE
+Q6:  T=Q6 BullsEye, U=Q6 Aimed, V=Q6 GE
+Q7:  W=Q7 BullsEye, X=Q7 Aimed, Y=Q7 GE
+Q8:  Z=Q8 BullsEye, AA=Q8 Aimed, AB=Q8 GE
+Q9:  AC=Q9 BullsEye, AD=Q9 Aimed, AE=Q9 GE
+Q10: AF=Q10 BullsEye, AG=Q10 Aimed, AH=Q10 GE
+Q11: AI=Q11 BullsEye, AJ=Q11 Aimed, AK=Q11 GE
+Q12: AL=Q12 BullsEye, AM=Q12 Aimed, AN=Q12 GE
+Q13: AO=Q13 BullsEye, AP=Q13 Aimed, AQ=Q13 GE
+Q14: AR=Q14 BullsEye, AS=Q14 Aimed, AT=Q14 GE
+Q15: AU=Q15 BullsEye, AV=Q15 Aimed, AW=Q15 GE
+Q16: AX=Q16 BullsEye, AY=Q16 Aimed, AZ=Q16 GE
+Q17: BA=Q17 BullsEye, BB=Q17 Aimed, BC=Q17 GE
+Q18: BD=Q18 BullsEye, BE=Q18 Aimed, BF=Q18 GE
+Q19: BG=Q19 BullsEye, BH=Q19 Aimed, BI=Q19 GE
+Q20: BJ=Q20 BullsEye, BK=Q20 Aimed, BL=Q20 GE
+Q21: BM=Q21 BullsEye, BN=Q21 Aimed, BO=Q21 GE
+Q22: BP=Q22 BullsEye, BQ=Q22 Aimed, BR=Q22 GE
+Q23: BS=Q23 BullsEye, BT=Q23 Aimed, BU=Q23 GE
+Q24: BV=Q24 BullsEye, BW=Q24 Aimed, BX=Q24 GE
+Q25: BY=Q25 BullsEye, BZ=Q25 Aimed, CA=Q25 GE
+Q26: CB=Q26 BullsEye, CC=Q26 Aimed, CD=Q26 GE
+Q27: CE=Q27 BullsEye, CF=Q27 Aimed, CG=Q27 GE
+Q28: CH=Q28 BullsEye, CI=Q28 Aimed, CJ=Q28 GE
+
+TOTALS SECTION (Columns CM-CP)
+-------------------------------
+CM: BullsEye Total  - Sum of all BullsEye ratings (max: 140 = 28×5)
+CN: Aimed Total     - Sum of all Aimed ratings (max: 140 = 28×5)
+CO: GE Total        - Sum of all GE ratings (max: 140 = 28×5)
+CP: Grand Total     - Sum of all three machine totals (max: 420)
+
+================================================================================
+4. CREATING YOUR SHEET (STEP-BY-STEP)
+================================================================================
+
+STEP 1: Create the Spreadsheet
+-------------------------------
+1. Go to: https://sheets.google.com
+2. Click: "+ Blank" to create a new spreadsheet
+3. Name it: "Xray_Machine_Evaluations" (or your choice)
+4. Click on the sheet tab at bottom
+5. Rename it to: "Responses"
+
+STEP 2: Get Your Sheet ID
+--------------------------
+1. Look at the URL in your browser
+2. The URL looks like:
+   https://docs.google.com/spreadsheets/d/SHEET_ID_HERE/edit
+3. Copy the SHEET_ID_HERE part
+4. Save this - you'll need it for Code.gs
+
+STEP 3: Add Headers (Row 1)
+----------------------------
+Option A - Manual Entry:
+Copy and paste these headers into row 1, starting from column A:
+
+Timestamp	Reviewer Name	Affiliation	Review Date	Q1 BullsEye	Q1 Aimed	Q1 GE	Q2 BullsEye	Q2 Aimed	Q2 GE	Q3 BullsEye	Q3 Aimed	Q3 GE	Q4 BullsEye	Q4 Aimed	Q4 GE	Q5 BullsEye	Q5 Aimed	Q5 GE	Q6 BullsEye	Q6 Aimed	Q6 GE	Q7 BullsEye	Q7 Aimed	Q7 GE	Q8 BullsEye	Q8 Aimed	Q8 GE	Q9 BullsEye	Q9 Aimed	Q9 GE	Q10 BullsEye	Q10 Aimed	Q10 GE	Q11 BullsEye	Q11 Aimed	Q11 GE	Q12 BullsEye	Q12 Aimed	Q12 GE	Q13 BullsEye	Q13 Aimed	Q13 GE	Q14 BullsEye	Q14 Aimed	Q14 GE	Q15 BullsEye	Q15 Aimed	Q15 GE	Q16 BullsEye	Q16 Aimed	Q16 GE	Q17 BullsEye	Q17 Aimed	Q17 GE	Q18 BullsEye	Q18 Aimed	Q18 GE	Q19 BullsEye	Q19 Aimed	Q19 GE	Q20 BullsEye	Q20 Aimed	Q20 GE	Q21 BullsEye	Q21 Aimed	Q21 GE	Q22 BullsEye	Q22 Aimed	Q22 GE	Q23 BullsEye	Q23 Aimed	Q23 GE	Q24 BullsEye	Q24 Aimed	Q24 GE	Q25 BullsEye	Q25 Aimed	Q25 GE	Q26 BullsEye	Q26 Aimed	Q26 GE	Q27 BullsEye	Q27 Aimed	Q27 GE	Q28 BullsEye	Q28 Aimed	Q28 GE	BullsEye Total	Aimed Total	GE Total	Grand Total
+
+Option B - Let Apps Script Create Headers:
+The Code.gs script will automatically create headers when it first runs.
+Just make sure the sheet tab is named "Responses".
+
+================================================================================
+5. ADDING FORMULAS FOR TOTALS
+================================================================================
+
+The Code.gs script automatically adds formulas for each row.
+But if you want to understand or manually add them, here's how:
+
+FOR ROW 2 (first data row):
+---------------------------
+
+Column CM (BullsEye Total):
+=SUMPRODUCT((MOD(COLUMN(E2:CJ2)-COLUMN(E2),3)=0)*(E2:CJ2))
+
+This sums every 3rd column starting from E (BullsEye ratings only)
+
+Column CN (Aimed Total):
+=SUMPRODUCT((MOD(COLUMN(F2:CK2)-COLUMN(F2),3)=0)*(F2:CK2))
+
+This sums every 3rd column starting from F (Aimed ratings only)
+
+Column CO (GE Total):
+=SUMPRODUCT((MOD(COLUMN(G2:CL2)-COLUMN(G2),3)=0)*(G2:CL2))
+
+This sums every 3rd column starting from G (GE ratings only)
+
+Column CP (Grand Total):
+=CM2+CN2+CO2
+
+This sums all three machine totals
+
+EXPLANATION:
+The SUMPRODUCT formula uses MOD to select every 3rd column:
+- MOD(COLUMN(E2:CJ2)-COLUMN(E2),3)=0 creates a pattern: TRUE, FALSE, FALSE, TRUE, FALSE, FALSE...
+- This multiplies by the cell value only when TRUE (every 3rd column)
+- Result: Only BullsEye columns are summed
+
+================================================================================
+6. FORMATTING RECOMMENDATIONS
+================================================================================
+
+Make your sheet easier to read with these formatting tips:
+
+HEADER ROW (Row 1):
+------------------
+1. Select row 1
+2. Format → Text → Bold
+3. Format → Fill color → Blue (#667eea)
+4. Format → Text color → White
+5. View → Freeze → 1 row (keeps headers visible when scrolling)
+
+COLUMN WIDTHS:
+--------------
+A (Timestamp): 150 pixels
+B (Reviewer Name): 150 pixels
+C (Affiliation): 180 pixels
+D (Review Date): 120 pixels
+E-CL (Ratings): 60 pixels each
+CM-CP (Totals): 100 pixels each
+
+To auto-resize: Select columns → Right-click → Resize columns → Fit to data
+
+CONDITIONAL FORMATTING (Optional but helpful):
+----------------------------------------------
+Highlight low scores (0-2) in red:
+1. Select range E2:CL (adjust for your data)
+2. Format → Conditional formatting
+3. Format cells if... → Less than or equal to → 2
+4. Background color → Light red (#f4cccc)
+
+Highlight high scores (4-5) in green:
+1. Format cells if... → Greater than or equal to → 4
+2. Background color → Light green (#d9ead3)
+
+COLOR-CODE MACHINE COLUMNS (Advanced):
+--------------------------------------
+To visually separate the three machines:
+
+BullsEye columns (E, H, K, N, Q, T, W, Z, AC, AF, AI, AL, AO, AR, AU, AX, BA, BD, BG, BJ, BM, BP, BS, BV, BY, CB, CE, CH):
+→ Light blue background (#cfe2f3)
+
+Aimed columns (F, I, L, O, R, U, X, AA, AD, AG, AJ, AM, AP, AS, AV, AY, BB, BE, BH, BK, BN, BQ, BT, BW, BZ, CC, CF, CI):
+→ Light purple background (#d9d2e9)
+
+GE columns (G, J, M, P, S, V, Y, AB, AE, AH, AK, AN, AQ, AT, AW, AZ, BC, BF, BI, BL, BO, BR, BU, BX, CA, CD, CG, CJ):
+→ Light pink background (#ead1dc)
+
+================================================================================
+7. SAMPLE DATA EXAMPLE
+================================================================================
+
+Here's what a completed row might look like:
+
+| Timestamp           | Reviewer Name | Affiliation    | Review Date | Q1 B | Q1 A | Q1 G | Q2 B | Q2 A | Q2 G | ... | BullsEye Total | Aimed Total | GE Total | Grand Total |
+|---------------------|---------------|----------------|-------------|------|------|------|------|------|------|-----|----------------|-------------|----------|-------------|
+| 11/5/2025 10:30:45  | Dr. Smith     | City Hospital  | 2025-11-05  | 4    | 3    | 5    | 3    | 4    | 4    | ... | 98             | 87          | 102      | 287         |
+
+The "..." represents the remaining 25 questions (Q3-Q28).
+
+INTERPRETING THE TOTALS:
+------------------------
+- BullsEye Total: 98 out of 140 (70% score)
+- Aimed Total: 87 out of 140 (62% score)
+- GE Total: 102 out of 140 (73% score)
+- Winner: GE machine scored highest in this evaluation
+
+================================================================================
+8. ANALYSIS & REPORTING TIPS
+================================================================================
+
+BASIC STATISTICS:
+-----------------
+Add these below your data (e.g., after row 100):
+
+Average Scores:
+Row 101: =AVERAGE(CM2:CM100)  // Average BullsEye total
+Row 101: =AVERAGE(CN2:CN100)  // Average Aimed total
+Row 101: =AVERAGE(CO2:CO100)  // Average GE total
+
+Highest Score:
+=MAX(CM2:CM100)  // Highest BullsEye total
+
+Lowest Score:
+=MIN(CM2:CM100)  // Lowest BullsEye total
+
+Response Count:
+=COUNTA(B2:B100)  // Number of submissions
+
+CATEGORY ANALYSIS:
+------------------
+To analyze by category (based on CSV structure):
+
+X-ray Amount (Q1-Q4):
+=SUM(E2, H2, K2, N2)  // BullsEye score for category 1
+
+You can create a separate "Analysis" sheet with category breakdowns.
+
+PIVOT TABLES:
+-------------
+Create a Pivot Table to analyze results:
+1. Data → Pivot table
+2. Rows: Add "Reviewer Name" or "Affiliation"
+3. Values: Add "BullsEye Total", "Aimed Total", "GE Total"
+4. Summarize by: AVERAGE or SUM
+
+CHARTS:
+-------
+Create visualizations:
+1. Insert → Chart
+2. Chart type: Column chart or Bar chart
+3. X-axis: Machine names (BullsEye, Aimed, GE)
+4. Y-axis: Average total scores
+
+CONSENSUS SCORING:
+------------------
+If multiple reviewers rate the same machines:
+=AVERAGE(CM2:CM10)  // Average of first 10 reviewers for BullsEye
+
+================================================================================
+9. TROUBLESHOOTING
+================================================================================
+
+ISSUE: Headers don't match expected layout
+-------------------------------------------
+Solution: Let Code.gs auto-create headers, or copy the tab-separated list from Section 4 exactly.
+
+ISSUE: Formulas showing #REF! error
+------------------------------------
+Solution: Check that your column references match the actual layout. E2:CJ2 should span all BullsEye columns.
+
+ISSUE: Totals showing incorrect numbers
+----------------------------------------
+Solution: Verify that ratings are numeric (0-5) and not text. Check for blank cells.
+
+ISSUE: Can't see all columns
+-----------------------------
+Solution: Scroll right or zoom out (Ctrl + mouse wheel). The sheet is wide (91 columns).
+
+ISSUE: Slow performance with many rows
+---------------------------------------
+Solution: 
+- Limit conditional formatting ranges
+- Remove array formulas if not needed
+- Consider archiving old data to another sheet
+
+ISSUE: Duplicate submissions
+-----------------------------
+Solution: Check "Timestamp" column for exact duplicates. Use Data → Remove duplicates if needed.
+
+ISSUE: Missing data in some columns
+------------------------------------
+Solution: Check that all 28 questions are being filled in the HTML form. Review the question counter in index.html.
+
+================================================================================
+📊 SHEET STRUCTURE SUMMARY
+================================================================================
+
+Total Columns: 91
+Total Questions: 28
+Machines Evaluated: 3 (BullsEye, Aimed, GE)
+Total Ratings per Submission: 84 (28 × 3)
+Maximum Possible Score per Machine: 140 (28 × 5)
+Maximum Possible Grand Total: 420 (140 × 3)
+
+Sheet Name: "Responses"
+Primary Key: Timestamp (Column A)
+Data Starts: Row 2
+Headers: Row 1
+
+================================================================================
+✅ CHECKLIST BEFORE DEPLOYING
+================================================================================
+
+□ Sheet created with correct name: "Responses"
+□ Sheet ID copied from URL
+□ Headers in Row 1 (either manual or auto-created)
+□ Header row frozen (View → Freeze → 1 row)
+□ Header row formatted (bold, colored background)
+□ Conditional formatting applied (optional)
+□ Test row added manually to verify layout
+□ Formulas working correctly in total columns
+□ Sheet ID added to Code.gs
+□ Permissions set (anyone with link can view/edit based on needs)
+
+================================================================================
+🎓 NEXT STEPS
+================================================================================
+
+1. Complete this sheet setup
+2. Update SHEET_ID in Code.gs
+3. Follow DEPLOYMENT_INSTRUCTIONS.txt to deploy Apps Script
+4. Test with sample submission
+5. Share sheet with stakeholders (view-only or edit access)
+
+================================================================================

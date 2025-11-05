@@ -1,0 +1,91 @@
+ROSES Prompt: Firebase Static HTML Form Using CSV Data
+
+🔹 R — Role
+
+You are a senior front-end engineer and Firebase Hosting expert.
+You specialize in:
+
+- Building responsive HTML forms for **static websites** (Firebase `public` folder).
+- Loading and parsing **CSV files** in the browser using client-side JavaScript.
+- Writing clear, commented code and simple setup instructions for non-developers.
+
+---
+
+🔹 O — Objective
+
+Create a complete, ready-to-use solution that:
+
+1. Generates an `index.html` form for Firebase Hosting.
+2. Loads question data from a CSV file (Xray_Evaluation_Questions_Simple.csv) placed in the same public folder.
+3. Uses the visual layout and structure inspired by `enhance_form.html` (which I will provide).
+4. Is easy to update by simply replacing the CSV file (no hardcoded questions).
+5. Includes a plain-language step-by-step guide in `instructions.txt`.
+
+---
+
+🔹 S — Scenario
+
+Context:
+
+- I am using **Firebase Hosting** with a static `public` folder.
+- I will place these files in the `public` folder:
+  - `index.html`  ← main form page (you will create this)
+  - `Xray_Evaluation_Questions_Simple.csv`  ← exported from `Xray_Evaluation_Questions_Simple.xlsx` (“Simple Evaluation” sheet)
+  - `enhance_form.html`   ← example layout / styling (I will provide this only as a reference)
+
+Technical constraints:
+
+- No backend code. **Only static files** and **client-side JavaScript**.
+- Use **vanilla JS**, HTML, and CSS.
+- You may use a **CSV parsing library via CDN** (e.g., PapaParse) that works in the browser.
+- The form must be **responsive**.
+
+---
+
+🔹 E — Expected Solution
+
+Your answer must include, in this order:
+
+1. **Short overview (2–4 sentences)**  
+   Explain the approach in simple language, mentioning that the form reads from a CSV file.
+
+2. **Full `index.html` code**  
+   - Valid HTML5 structure.
+   - Layout inspired by `form.html`.
+   - A `<form>` section that will be populated from `xray_questions.csv`.
+   - `<script>` that:
+     - Fetches `Xray_Evaluation_Questions_Simple.csv` from the same folder.
+     - Parses the CSV (using a browser-ready CSV parser or custom code).
+     - Dynamically creates form questions based on each row.
+   - Clear comments explaining:
+     - CSV file name and path.
+     - CSV column mapping (e.g., which column is the question text, rating label, etc.).
+
+3. **Configuration notes**  
+   - Which **CSV headers** you expect.
+   - How to change the mapping if the CSV structure changes.
+   - Any limitations (e.g., must run via HTTP/HTTPS, not from file:///).
+
+4. **`instructions.txt` content**  
+   - Text I can copy into a file named `instructions.txt`.
+   - Includes:
+     - How to export the Excel “Simple Evaluation” sheet to `xray_questions.csv`.
+     - Where to put `index.html` and `xray_questions.csv` in Firebase `public`.
+     - How to deploy with Firebase Hosting.
+     - How to update questions later by replacing the CSV.
+     - Simple troubleshooting tips.
+
+5. **Optional future improvements (3–5 bullets)**  
+   - Ideas like saving answers to a backend, adding validation, exporting responses, etc.
+
+---
+
+🔹 S — Steps (How you should work)
+
+1. Assume the CSV was exported from `Xray_Evaluation_Questions_Simple.xlsx` “Simple Evaluation” sheet and has logical column headers.
+2. Design a mapping from CSV columns → form fields (question section, question text, rating control).
+3. Write `index.html` with responsive layout and dynamic form rendering from CSV.
+4. Add comments in the code showing where to modify file names and column mappings.
+5. Write clear `instructions.txt` content for setup, deployment, and updating questions.
+6. Check that everything works in a static Firebase environment (no server-side features).
+7. Present the solution following the Expected Solution order.

@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X-ray Form - Offline Test Version</title>
+<style>
+  :root {
+    --primary-color: #2563eb;
+    --primary-hover: #1d4ed8;
+    --secondary-color: #10b981;
+    --bg-light: #f8fafc;
+    --bg-white: #ffffff;
+    --border-color: #e2e8f0;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+    --bullseye-color: #3b82f6;
+    --aimed-color: #8b5cf6;
+    --ge-color: #ec4899;
+  }
+  
+  * { box-sizing: border-box; }
+  
+  body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+    margin: 0;
+    min-height: 100vh;
+  }
+  
+  .container { max-width: 1400px; margin: 0 auto; }
+  
+  h1 {
+    text-align: center;
+    color: white;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+  }
+  
+  .subtitle {
+    text-align: center;
+    color: rgba(255,255,255,0.9);
+    font-size: 1.1em;
+    margin-bottom: 30px;
+  }
+  
+  .upload-section {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .file-input { display: none; }
+  
+  .upload-button {
+    background: var(--primary-color);
+    color: white;
+    padding: 16px 40px;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    cursor: pointer;
+    display: inline-block;
+    transition: all 0.3s;
+  }
+  
+  .upload-button:hover { background: var(--primary-hover); transform: translateY(-2px); }
+  
+  form { 
+    background: var(--bg-white);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    display: none;
+  }
+  
+  form.loaded { display: block; }
+  
+  .intro { 
+    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    border-left: 5px solid var(--primary-color);
+  }
+  
+  .intro h3 { margin-top: 0; color: var(--primary-color); font-size: 1.3em; }
+  
+  .rating-scale {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-top: 15px;
+  }
+  
+  .rating-scale-item {
+    background: white;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    border: 2px solid var(--border-color);
+    transition: transform 0.2s;
+  }
+  
+  .rating-scale-item:hover { transform: translateY(-2px); border-color: var(--primary-color); }
+  .rating-scale-item .score { font-size: 1.5em; font-weight: bold; color: var(--primary-color); }
+  .rating-scale-item .label { font-size: 0.9em; color: var(--text-secondary); margin-top: 4px; }
+  
+  .reviewer-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+    padding: 25px;
+    background: var(--bg-light);
+    border-radius: 12px;
+  }
+  
+  .reviewer-info label { display: block; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; font-size: 0.95em; }
+  
+  input[type="text"], input[type="date"] { 
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 2px solid var(--border-color);
+    font-size: 1em;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  
+  input[type="text"]:focus, input[type="date"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+  
+  .section { 
+    margin: 40px 0;
+    padding: 30px;
+    border-radius: 16px;
+    background: white;
+    border: 2px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .section-title {
+    margin: 0 0 25px 0;
+    color: var(--text-primary);
+    font-size: 1.8em;
+    padding-bottom: 15px;
+    border-bottom: 3px solid var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .section-title::before { content: "📊"; font-size: 1.2em; }
+  
+  .question { 
+    margin-bottom: 35px;
+    padding: 25px;
+    border-radius: 12px;
+    background: var(--bg-light);
+    border: 1px solid var(--border-color);
+  }
+  
+  .question-header { margin-bottom: 20px; }
+  .question-header p { font-size: 1.15em; font-weight: 600; color: var(--text-primary); margin: 0 0 10px 0; }
+  
+  .spec {
+    display: inline-block;
+    background: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    font-style: italic;
+  }
+  
+  .machine-notes { 
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    border-left: 4px solid var(--secondary-color);
+  }
+  
+  .machine-notes-title {
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .machine-notes-title::before { content: "ℹ️"; }
+  
+  .specs-grid { display: grid; gap: 12px; margin-top: 12px; }
+  
+  .spec-item {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 15px;
+    padding: 12px;
+    background: var(--bg-light);
+    border-radius: 8px;
+    align-items: center;
+  }
+  
+  .spec-machine { font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+  .spec-machine.bullseye::before { content: "●"; color: var(--bullseye-color); font-size: 1.5em; }
+  .spec-machine.aimed::before { content: "●"; color: var(--aimed-color); font-size: 1.5em; }
+  .spec-machine.ge::before { content: "●"; color: var(--ge-color); font-size: 1.5em; }
+  .spec-value { color: var(--text-secondary); line-height: 1.5; }
+  
+  .ratings-container { margin-top: 20px; }
+  .ratings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+  
+  .machine-rating {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    border: 3px solid var(--border-color);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .machine-rating::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 6px; }
+  .machine-rating.bullseye { border-color: var(--bullseye-color); }
+  .machine-rating.bullseye::before { background: linear-gradient(90deg, var(--bullseye-color), #60a5fa); }
+  .machine-rating.aimed { border-color: var(--aimed-color); }
+  .machine-rating.aimed::before { background: linear-gradient(90deg, var(--aimed-color), #a78bfa); }
+  .machine-rating.ge { border-color: var(--ge-color); }
+  .machine-rating.ge::before { background: linear-gradient(90deg, var(--ge-color), #f472b6); }
+  .machine-rating:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+  
+  .machine-rating-title { font-weight: 700; font-size: 1.1em; margin: 10px 0 15px 0; color: var(--text-primary); text-align: center; }
+  
+  .scale-options { display: flex; justify-content: space-between; gap: 8px; margin-top: 12px; }
+  .scale-options label { flex: 1; position: relative; }
+  .scale-options input[type="radio"] { position: absolute; opacity: 0; pointer-events: none; }
+  
+  .scale-options label span {
+    display: block;
+    padding: 12px 8px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.1em;
+    border-radius: 8px;
+    background: var(--bg-light);
+    border: 2px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+  
+  .scale-options label:hover span { border-color: var(--primary-color); transform: translateY(-2px); }
+  
+  .scale-options input[type="radio"]:checked + span {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    transform: scale(1.05);
+  }
+  
+  .scale-legend {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 0.75em;
+    color: var(--text-secondary);
+    padding: 0 4px;
+  }
+  
+  .submit-row { text-align: center; margin-top: 40px; padding-top: 30px; border-top: 2px solid var(--border-color); }
+  
+  button[type="submit"] { 
+    padding: 16px 48px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: white;
+    font-size: 1.2em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  button[type="submit"]:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4); }
+  button[type="submit"]:active { transform: translateY(0); }
+  
+  .progress-indicator {
+    position: sticky;
+    top: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 20px;
+    z-index: 100;
+  }
+  
+  .progress-bar { height: 8px; background: var(--bg-light); border-radius: 10px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); width: 0%; transition: width 0.3s ease; }
+  .progress-text { text-align: center; margin-top: 8px; font-size: 0.9em; color: var(--text-secondary); font-weight: 600; }
+  
+  @media (max-width: 768px) {
+    body { padding: 10px; }
+    form { padding: 20px; }
+    h1 { font-size: 1.8em; }
+    .ratings-grid { grid-template-columns: 1fr; }
+    .scale-options label span { padding: 10px 4px; font-size: 0.95em; }
+    .spec-item { grid-template-columns: 1fr; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🏥 X-ray Machine Desk Review</h1>
+  <p class="subtitle">Comprehensive Rating & Comparison Form (Offline Test Version)</p>
+  
+  <div class="upload-section">
+    <h2>📁 Load CSV File</h2>
+    <p style="color: #64748b; margin-bottom: 20px;">
+      Select your CSV file to load questions into the form
+    </p>
+    <input type="file" id="csvFile" class="file-input" accept=".csv">
+    <label for="csvFile" class="upload-button">
+      Choose CSV File
+    </label>
+    <p style="margin-top: 15px; font-size: 0.9em; color: #64748b;">
+      File: Xray_Evaluation_Questions_Simple.csv
+    </p>
+  </div>
+  
+  <form id="reviewForm">
+    <div class="progress-indicator">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-text" id="progressText">0% Complete</div>
+    </div>
+    
+    <div class="intro">
+      <h3>📋 Rating Instructions</h3>
+      <p><strong>How to rate:</strong> For every question, give a score from <strong>0 to 5</strong> for each machine based on the specifications provided.</p>
+      <div class="rating-scale">
+        <div class="rating-scale-item"><div class="score">0</div><div class="label">Very Bad</div></div>
+        <div class="rating-scale-item"><div class="score">1</div><div class="label">Bad</div></div>
+        <div class="rating-scale-item"><div class="score">2</div><div class="label">Okay</div></div>
+        <div class="rating-scale-item"><div class="score">3</div><div class="label">Good</div></div>
+        <div class="rating-scale-item"><div class="score">4</div><div class="label">Very Good</div></div>
+        <div class="rating-scale-item"><div class="score">5</div><div class="label">Excellent</div></div>
+      </div>
+    </div>
+    
+    <div class="reviewer-info">
+      <div>
+        <label>👤 Reviewer Name</label>
+        <input type="text" name="reviewer_name" placeholder="Enter your full name" required>
+      </div>
+      <div>
+        <label>💼 Role / Position</label>
+        <input type="text" name="reviewer_role" placeholder="Enter your role" required>
+      </div>
+      <div>
+        <label>📅 Review Date</label>
+        <input type="date" name="review_date" required>
+      </div>
+    </div>
+
+    <div id="questionsContainer"></div>
+
+    <div class="submit-row">
+      <button type="submit">📤 Submit Review</button>
+    </div>
+  </form>
+</div>
+
+<script>
+// Embedded PapaParse library (for offline use)
+!function(e,t){"object"==typeof module&&"undefined"!=typeof module.exports?module.exports=t():"function"==typeof define&&define.amd?define(t):e.Papa=t()}(this,function s(){"use strict";var f="undefined"!=typeof self?self:"undefined"!=typeof window?window:void 0!==f?f:{};var n=!f.document&&!!f.postMessage,o=n&&/blob:/i.test((f.location||{}).protocol),a={},h=0,b={parse:function(e,t){var r=(t=t||{}).dynamicTyping||!1;J(r)&&(t.dynamicTypingFunction=r,r={});if(t.dynamicTyping=r,t.transform=!!J(t.transform)&&t.transform,t.worker&&b.WORKERS_SUPPORTED){var i=function(){if(!b.WORKERS_SUPPORTED)return!1;var e=(r=f.URL||f.webkitURL||null,i=s.toString(),b.BLOB_URL||(b.BLOB_URL=r.createObjectURL(new Blob(["(",i,")();"],{type:"text/javascript"})))),t=new f.Worker(e);var r,i;return t.onmessage=_,t.id=h++,a[t.id]=t}();return i.userStep=t.step,i.userChunk=t.chunk,i.userComplete=t.complete,i.userError=t.error,t.step=J(t.step),t.chunk=J(t.chunk),t.complete=J(t.complete),t.error=J(t.error),delete t.worker,void i.postMessage({input:e,config:t,workerId:i.id})}var n=null;b.NODE_STREAM_INPUT,"string"==typeof e?n=t.download?new l(t):new p(t):!0===e.readable&&J(e.read)&&J(e.on)?n=new g(t):(f.File&&e instanceof File||e instanceof Object)&&(n=new c(t));return n.stream(e)},unparse:function(e,t){var n=!1,_=!0,m=",",y="\r\n",s='"',a=s+s,r=!1,i=null,o=!1;!function(){if("object"!=typeof t)return;"string"!=typeof t.delimiter||b.BAD_DELIMITERS.filter(function(e){return-1!==t.delimiter.indexOf(e)}).length||(m=t.delimiter);("boolean"==typeof t.quotes||"function"==typeof t.quotes||Array.isArray(t.quotes))&&(n=t.quotes);"boolean"!=typeof t.skipEmptyLines&&"string"!=typeof t.skipEmptyLines||(r=t.skipEmptyLines);"string"==typeof t.newline&&(y=t.newline);"string"==typeof t.quoteChar&&(s=t.quoteChar);"boolean"==typeof t.header&&(_=t.header);if(Array.isArray(t.columns)){if(0===t.columns.length)throw new Error("Option columns is empty");i=t.columns}void 0!==t.escapeChar&&(a=t.escapeChar+s);"boolean"==typeof t.escapeFormulae&&(o=t.escapeFormulae)}();var h=new RegExp(Q(s),"g");"string"==typeof e&&(e=JSON.parse(e));if(Array.isArray(e)){if(!e.length||Array.isArray(e[0]))return u(null,e,r);if("object"==typeof e[0])return u(i||Object.keys(e[0]),e,r)}else if("object"==typeof e)return"string"==typeof e.data&&(e.data=JSON.parse(e.data)),Array.isArray(e.data)&&(e.fields||(e.fields=e.meta&&e.meta.fields),e.fields||(e.fields=Array.isArray(e.data[0])?e.fields:"object"==typeof e.data[0]?Object.keys(e.data[0]):[]),Array.isArray(e.data[0])||"object"==typeof e.data[0]||(e.data=[e.data])),u(e.fields||[],e.data||[],r);throw new Error("Unable to serialize unrecognized input");function u(e,t,r){var i="";"string"==typeof e&&(e=JSON.parse(e)),"string"==typeof t&&(t=JSON.parse(t));var n=Array.isArray(e)&&0<e.length,s=!Array.isArray(t[0]);if(n&&_){for(var a=0;a<e.length;a++)0<a&&(i+=m),i+=v(e[a],a);0<t.length&&(i+=y)}for(var o=0;o<t.length;o++){var h=n?e.length:t[o].length,u=!1,f=n?0===Object.keys(t[o]).length:0===t[o].length;if(r&&!n&&(u="greedy"===r?""===t[o].join("").trim():1===t[o].length&&0===t[o][0].length),"greedy"===r&&n){for(var d=[],l=0;l<h;l++){var c=s?e[l]:l;d.push(t[o][c])}u=""===d.join("").trim()}if(!u){for(var p=0;p<h;p++){0<p&&!f&&(i+=m);var g=n&&s?e[p]:p;i+=v(t[o][g],p)}o<t.length-1&&(!r||0<h&&!f)&&(i+=y)}}return i}function v(e,t){if(null==e)return"";if(e.constructor===Date)return JSON.stringify(e).slice(1,25);!0===o&&"string"==typeof e&&null!==e.match(/^[=+\-@].*$/)&&(e="'"+e);var r=e.toString().replace(h,a),i="boolean"==typeof n&&n||"function"==typeof n&&n(e,t)||Array.isArray(n)&&n[t]||function(e,t){for(var r=0;r<t.length;r++)if(-1<e.indexOf(t[r]))return!0;return!1}(r,b.BAD_DELIMITERS)||-1<r.indexOf(m)||" "===r.charAt(0)||" "===r.charAt(r.length-1);return i?s+r+s:r}}};if(b.RECORD_SEP=String.fromCharCode(30),b.UNIT_SEP=String.fromCharCode(31),b.BYTE_ORDER_MARK="\ufeff",b.BAD_DELIMITERS=["\r","\n",'"',b.BYTE_ORDER_MARK],b.WORKERS_SUPPORTED=!n&&!!f.Worker,b.NODE_STREAM_INPUT=1,b.LocalChunkSize=10485760,b.RemoteChunkSize=5242880,b.DefaultDelimiter=",",b.Parser=E,b.ParserHandle=r,b.NetworkStreamer=l,b.FileStreamer=c,b.StringStreamer=p,b.ReadableStreamStreamer=g,f.jQuery){var d=f.jQuery;d.fn.parse=function(o){var r=o.config||{},h=[];return this.each(function(e){if(!("INPUT"===d(this).prop("tagName").toUpperCase()&&"file"===d(this).attr("type").toLowerCase()&&f.FileReader)||!this.files||0===this.files.length)return!0;for(var t=0;t<this.files.length;t++)h.push({file:this.files[t],inputElem:this,instanceConfig:d.extend({},r)})}),e(),this;function e(){if(0!==h.length){var e,t,r,i,n=h[0];if(J(o.before)){var s=o.before(n.file,n.inputElem);if("object"==typeof s){if("abort"===s.action)return e="AbortError",t=n.file,r=n.inputElem,i=s.reason,void(J(o.error)&&o.error({name:e},t,r,i));if("skip"===s.action)return void u();"object"==typeof s.config&&(n.instanceConfig=d.extend(n.instanceConfig,s.config))}else if("skip"===s)return void u()}var a=n.instanceConfig.complete;n.instanceConfig.complete=function(e){J(a)&&a(e,n.file,n.inputElem),u()},b.parse(n.file,n.instanceConfig)}else J(o.complete)&&o.complete()}function u(){h.splice(0,1),e()}}}function u(e){this._handle=null,this._finished=!1,this._completed=!1,this._halted=!1,this._input=null,this._baseIndex=0,this._partialLine="",this._rowCount=0,this._start=0,this._nextChunk=null,this.isFirstChunk=!0,this._completeResults={data:[],errors:[],meta:{}},function(e){var t=w(e);t.chunkSize=parseInt(t.chunkSize),e.step||e.chunk||(t.chunkSize=null);this._handle=new r(t),(this._handle.streamer=this)._config=t}.call(this,e),this.parseChunk=function(e,t){if(this.isFirstChunk&&J(this._config.beforeFirstChunk)){var r=this._config.beforeFirstChunk(e);void 0!==r&&(e=r)}this.isFirstChunk=!1,this._halted=!1;var i=this._partialLine+e;this._partialLine="";var n=this._handle.parse(i,this._baseIndex,!this._finished);if(this._handle.paused()||this._handle.aborted())return this._halted=!0,!1;var s=n.meta.cursor;this._finished||(this._partialLine=i.substring(s-this._baseIndex),this._baseIndex=s),n&&n.data&&(this._rowCount+=n.data.length);var a=this._finished||this._config.preview&&this._rowCount>=this._config.preview;if(o)f.postMessage({results:n,workerId:b.WORKER_ID,finished:a});else if(J(this._config.chunk)&&!t){if(this._config.chunk(n,this._handle),this._handle.paused()||this._handle.aborted())return this._halted=!0,void 0;n=void 0,this._completeResults=void 0}return this._config.step||this._config.chunk||(this._completeResults.data=this._completeResults.data.concat(n.data),this._completeResults.errors=this._completeResults.errors.concat(n.errors),this._completeResults.meta=n.meta),this._completed||!a||!J(this._config.complete)||n&&n.meta.aborted||(this._config.complete(this._completeResults,this._handle),this._completed=!0),a||n&&n.meta.paused||this._nextChunk(),n},this._sendError=function(e){J(this._config.error)?this._config.error(e):o&&this._config.error&&f.postMessage({workerId:b.WORKER_ID,error:e,finished:!1})}}function l(e){var i;(e=e||{}).chunkSize||(e.chunkSize=b.RemoteChunkSize),u.call(this,e),this._nextChunk=n?function(){this._readChunk(),this._chunkLoaded()}:function(){this._readChunk()},this.stream=function(e){this._input=e,this._nextChunk()},this._readChunk=function(){if(this._finished)this._chunkLoaded();else{if(i=new XMLHttpRequest,this._config.withCredentials&&(i.withCredentials=this._config.withCredentials),n||(i.onload=v(this._chunkLoaded,this),i.onerror=v(this._chunkError,this)),i.open(this._config.downloadRequestBody?"POST":"GET",this._input,!n),this._config.downloadRequestHeaders){var e=this._config.downloadRequestHeaders;for(var t in e)i.setRequestHeader(t,e[t])}if(this._config.chunkSize){var r=this._start+this._config.chunkSize-1;i.setRequestHeader("Range","bytes="+this._start+"-"+r)}try{i.send(this._config.downloadRequestBody)}catch(e){this._chunkError(e.message)}n&&0===i.status&&this._chunkError()}},this._chunkLoaded=function(){4===i.readyState&&(i.status<200||400<=i.status?this._chunkError():(this._start+=this._config.chunkSize?this._config.chunkSize:i.responseText.length,this._finished=!this._config.chunkSize||this._start>=function(e){var t=e.getResponseHeader("Content-Range");if(null===t)return-1;return parseInt(t.substring(t.lastIndexOf("/")+1))}(i),this.parseChunk(i.responseText)))},this._chunkError=function(e){var t=i.statusText||e;this._sendError(new Error(t))}}function c(e){var i,n;(e=e||{}).chunkSize||(e.chunkSize=b.LocalChunkSize),u.call(this,e);var s="undefined"!=typeof FileReader;this.stream=function(e){this._input=e,n=e.slice||e.webkitSlice||e.mozSlice,s?((i=new FileReader).onload=v(this._chunkLoaded,this),i.onerror=v(this._chunkError,this)):i=new FileReaderSync,this._nextChunk()},this._nextChunk=function(){this._finished||this._config.preview&&!(this._rowCount<this._config.preview)||this._readChunk()},this._readChunk=function(){var e=this._input;if(this._config.chunkSize){var t=Math.min(this._start+this._config.chunkSize,this._input.size);e=n.call(e,this._start,t)}var r=i.readAsText(e,this._config.encoding);s||this._chunkLoaded({target:{result:r}})},this._chunkLoaded=function(e){this._start+=this._config.chunkSize,this._finished=!this._config.chunkSize||this._start>=this._input.size,this.parseChunk(e.target.result)},this._chunkError=function(){this._sendError(i.error)}}function p(e){var r;u.call(this,e=e||{}),this.stream=function(e){return r=e,this._nextChunk()},this._nextChunk=function(){if(!this._finished){var e,t=this._config.chunkSize;return t?(e=r.substring(0,t),r=r.substring(t)):(e=r,r=""),this._finished=!r,this.parseChunk(e)}}}function g(e){u.call(this,e=e||{});var t=[],r=!0,i=!1;this.pause=function(){u.prototype.pause.apply(this,arguments),this._input.pause()},this.resume=function(){u.prototype.resume.apply(this,arguments),this._input.resume()},this.stream=function(e){this._input=e,this._input.on("data",this._streamData),this._input.on("end",this._streamEnd),this._input.on("error",this._streamError)},this._checkIsFinished=function(){i&&1===t.length&&(this._finished=!0)},this._nextChunk=function(){this._checkIsFinished(),t.length?this.parseChunk(t.shift()):r=!0},this._streamData=v(function(e){try{t.push("string"==typeof e?e:e.toString(this._config.encoding)),r&&(r=!1,this._checkIsFinished(),this.parseChunk(t.shift()))}catch(e){this._streamError(e)}},this),this._streamError=v(function(e){this._streamCleanUp(),this._sendError(e)},this),this._streamEnd=v(function(){this._streamCleanUp(),i=!0,this._streamData("")},this),this._streamCleanUp=v(function(){this._input.removeListener("data",this._streamData),this._input.removeListener("end",this._streamEnd),this._input.removeListener("error",this._streamError)},this)}function r(g){var a,o,h,i=Math.pow(2,53),n=-i,s=/^\s*-?(\d+\.?|\.\d+|\d+\.\d+)(e[-+]?\d+)?\s*$/,u=/(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))/,t=this,r=0,f=0,d=!1,e=!1,l=[],c={data:[],errors:[],meta:{}};if(J(g.step)){var p=g.step;g.step=function(e){if(c=e,_())m();else{if(m(),0===c.data.length)return;r+=e.data.length,g.preview&&r>g.preview?o.abort():(c.data=c.data[0],p(c,t))}}}function y(e){return"greedy"===g.skipEmptyLines?""===e.join("").trim():1===e.length&&0===e[0].length}function m(){if(c&&h&&(k("Delimiter","UndetectableDelimiter","Unable to auto-detect delimiting character; defaulted to '"+b.DefaultDelimiter+"'"),h=!1),g.skipEmptyLines)for(var e=0;e<c.data.length;e++)y(c.data[e])&&c.data.splice(e--,1);return _()&&function(){if(!c)return;function e(e){J(g.transformHeader)&&(e=g.transformHeader(e)),l.push(e)}if(Array.isArray(c.data[0])){for(var t=0;_()&&t<c.data.length;t++)c.data[t].forEach(e);c.data.splice(0,1)}else c.data.forEach(e)}(),function(){if(!c||!g.header&&!g.dynamicTyping&&!g.transform)return c;function e(e,t){var r,i=g.header?{}:[];for(r=0;r<e.length;r++){var n=r,s=e[r];g.header&&(n=r>=l.length?"__parsed_extra":l[r]),g.transform&&(s=g.transform(s,n)),s=v(n,s),"__parsed_extra"===n?(i[n]=i[n]||[],i[n].push(s)):i[n]=s}return g.header&&(r>l.length?k("FieldMismatch","TooManyFields","Too many fields: expected "+l.length+" fields but parsed "+r,f+t):r<l.length&&k("FieldMismatch","TooFewFields","Too few fields: expected "+l.length+" fields but parsed "+r,f+t)),i}var t=1;!c.data.length||Array.isArray(c.data[0])?(c.data=c.data.map(e),t=c.data.length):c.data=e(c.data,0);g.header&&c.meta&&(c.meta.fields=l);return f+=t,c}()}function _(){return g.header&&0===l.length}function v(e,t){return r=e,g.dynamicTypingFunction&&void 0===g.dynamicTyping[r]&&(g.dynamicTyping[r]=g.dynamicTypingFunction(r)),!0===(g.dynamicTyping[r]||g.dynamicTyping)?"true"===t||"TRUE"===t||"false"!==t&&"FALSE"!==t&&(function(e){if(s.test(e)){var t=parseFloat(e);if(n<t&&t<i)return!0}return!1}(t)?parseFloat(t):u.test(t)?new Date(t):""===t?null:t):t;var r}function k(e,t,r,i){var n={type:e,code:t,message:r};void 0!==i&&(n.row=i),c.errors.push(n)}this.parse=function(e,t,r){var i=g.quoteChar||'"';if(g.newline||(g.newline=function(e,t){e=e.substring(0,1048576);var r=new RegExp(Q(t)+"([^]*?)"+Q(t),"gm"),i=(e=e.replace(r,"")).split("\r"),n=e.split("\n"),s=1<n.length&&n[0].length<i[0].length;if(1===i.length||s)return"\n";for(var a=0,o=0;o<i.length;o++)"\n"===i[o][0]&&a++;return a>=i.length/2?"\r\n":"\r"}(e,i)),h=!1,g.delimiter)J(g.delimiter)&&(g.delimiter=g.delimiter(e),c.meta.delimiter=g.delimiter);else{var n=function(e,t,r,i,n){var s,a,o,h;n=n||[",","\t","|",";",b.RECORD_SEP,b.UNIT_SEP];for(var u=0;u<n.length;u++){var f=n[u],d=0,l=0,c=0;o=void 0;for(var p=new E({comments:i,delimiter:f,newline:t,preview:10}).parse(e),g=0;g<p.data.length;g++)if(r&&y(p.data[g]))c++;else{var _=p.data[g].length;l+=_,void 0!==o?0<_&&(d+=Math.abs(_-o),o=_):o=_}0<p.data.length&&(l/=p.data.length-c),(void 0===a||d<=a)&&(void 0===h||h<l)&&1.99<l&&(a=d,s=f,h=l)}return{successful:!!(g.delimiter=s),bestDelimiter:s}}(e,g.newline,g.skipEmptyLines,g.comments,g.delimitersToGuess);n.successful?g.delimiter=n.bestDelimiter:(h=!0,g.delimiter=b.DefaultDelimiter),c.meta.delimiter=g.delimiter}var s=w(g);return g.preview&&g.header&&s.preview++,a=e,o=new E(s),c=o.parse(a,t,r),m(),d?{meta:{paused:!0}}:c||{meta:{paused:!1}}},this.paused=function(){return d},this.pause=function(){d=!0,o.abort(),a=J(g.chunk)?"":a.substring(o.getCharIndex())},this.resume=function(){t.streamer._halted?(d=!1,t.streamer.parseChunk(a,!0)):setTimeout(t.resume,3)},this.aborted=function(){return e},this.abort=function(){e=!0,o.abort(),c.meta.aborted=!0,J(g.complete)&&g.complete(c),a=""}}function Q(e){return e.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}function E(e){var S,O=(e=e||{}).delimiter,x=e.newline,I=e.comments,T=e.step,D=e.preview,A=e.fastMode,L=S=void 0===e.quoteChar?'"':e.quoteChar;if(void 0!==e.escapeChar&&(L=e.escapeChar),("string"!=typeof O||-1<b.BAD_DELIMITERS.indexOf(O))&&(O=","),I===O)throw new Error("Comment character same as delimiter");!0===I?I="#":("string"!=typeof I||-1<b.BAD_DELIMITERS.indexOf(I))&&(I=!1),"\n"!==x&&"\r"!==x&&"\r\n"!==x&&(x="\n");var F=0,z=!1;this.parse=function(r,t,i){if("string"!=typeof r)throw new Error("Input must be a string");var n=r.length,e=O.length,s=x.length,a=I.length,o=J(T),h=[],u=[],f=[],d=F=0;if(!r)return C();if(A||!1!==A&&-1===r.indexOf(S)){for(var l=r.split(x),c=0;c<l.length;c++){if(f=l[c],F+=f.length,c!==l.length-1)F+=x.length;else if(i)return C();if(!I||f.substring(0,a)!==I){if(o){if(h=[],k(f.split(O)),R(),z)return C()}else k(f.split(O));if(D&&D<=c)return h=h.slice(0,D),C(!0)}}return C()}for(var p=r.indexOf(O,F),g=r.indexOf(x,F),_=new RegExp(Q(L)+Q(S),"g"),m=r.indexOf(S,F);;)if(r[F]!==S)if(I&&0===f.length&&r.substring(F,F+a)===I){if(-1===g)return C();F=g+s,g=r.indexOf(x,F),p=r.indexOf(O,F)}else if(-1!==p&&(p<g||-1===g))f.push(r.substring(F,p)),F=p+e,p=r.indexOf(O,F);else{if(-1===g)break;if(f.push(r.substring(F,g)),w(g+s),o&&(R(),z))return C();if(D&&h.length>=D)return C(!0)}else for(m=F,F++;;){if(-1===(m=r.indexOf(S,m+1)))return i||u.push({type:"Quotes",code:"MissingQuotes",message:"Quoted field unterminated",row:h.length,index:F}),E();if(m===n-1)return E(r.substring(F,m).replace(_,S));if(S!==L||r[m+1]!==L){if(S===L||0===m||r[m-1]!==L){-1!==p&&p<m+1&&(p=r.indexOf(O,m+1)),-1!==g&&g<m+1&&(g=r.indexOf(x,m+1));var y=b(-1===g?p:Math.min(p,g));if(r[m+1+y]===O){f.push(r.substring(F,m).replace(_,S)),r[F=m+1+y+e]!==S&&(m=r.indexOf(S,F)),p=r.indexOf(O,F),g=r.indexOf(x,F);break}var v=b(g);if(r.substring(m+1+v,m+1+v+s)===x){if(f.push(r.substring(F,m).replace(_,S)),w(m+1+v+s),p=r.indexOf(O,F),m=r.indexOf(S,F),o&&(R(),z))return C();if(D&&h.length>=D)return C(!0);break}u.push({type:"Quotes",code:"InvalidQuotes",message:"Trailing quote on quoted field is malformed",row:h.length,index:F}),m++}}else m++}return E();function k(e){h.push(e),d=F}function b(e){var t=0;if(-1!==e){var r=r.substring(m+1,e);r&&""===r.trim()&&(t=r.length)}return t}function E(e){return i||(void 0===e&&(e=r.substring(F)),f.push(e),F=n,k(f),o&&R()),C()}function w(e){F=e,k(f),f=[],g=r.indexOf(x,F)}function C(e){return{data:h,errors:u,meta:{delimiter:O,linebreak:x,aborted:z,truncated:!!e,cursor:d+(t||0)}}}function R(){T(C()),h=[],u=[]}},this.abort=function(){z=!0},this.getCharIndex=function(){return F}}function _(e){var t=e.data,r=a[t.workerId],i=!1;if(t.error)r.userError(t.error,t.file);else if(t.results&&t.results.data){var n={abort:function(){i=!0,m(t.workerId,{data:[],errors:[],meta:{aborted:!0}})},pause:y,resume:y};if(J(r.userStep)){for(var s=0;s<t.results.data.length&&(r.userStep({data:t.results.data[s],errors:t.results.errors,meta:t.results.meta},n),!i);s++);delete t.results}else J(r.userChunk)&&(r.userChunk(t.results,n,t.file),delete t.results)}t.finished&&!i&&m(t.workerId,t.results)}function m(e,t){var r=a[e];J(r.userComplete)&&r.userComplete(t),r.terminate(),delete a[e]}function y(){throw new Error("Not implemented.")}function w(e){if("object"!=typeof e||null===e)return e;var t=Array.isArray(e)?[]:{};for(var r in e)t[r]=w(e[r]);return t}function v(e,t){return function(){e.apply(t,arguments)}}function J(e){return"function"==typeof e}return o&&(f.onmessage=function(e){var t=e.data;void 0===b.WORKER_ID&&t&&(b.WORKER_ID=t.workerId);if("string"==typeof t.input)f.postMessage({workerId:b.WORKER_ID,results:b.parse(t.input,t.config),finished:!0});else if(f.File&&t.input instanceof File||t.input instanceof Object){var r=b.parse(t.input,t.config);r&&f.postMessage({workerId:b.WORKER_ID,results:r,finished:!0})}}),(l.prototype=Object.create(u.prototype)).constructor=l,(c.prototype=Object.create(u.prototype)).constructor=c,(p.prototype=Object.create(p.prototype)).constructor=p,(g.prototype=Object.create(u.prototype)).constructor=g,b});
+
+// Configuration
+const CSV_COLUMNS = {
+  CATEGORY: "What it's about",
+  CRITERIA: "What to check",
+  QUESTION: "Your rating question (0–5)",
+  BULLSEYE_SPEC: "BullsEye machine (what the papers say)",
+  AIMED_SPEC: "Aimed machine (what the papers say)",
+  GE_SPEC: "GE machine (what the papers say)"
+};
+
+const MACHINES = [
+  { id: 'bullseye', name: 'BullsEye – SG Jumong + DRTECH', colorClass: 'bullseye' },
+  { id: 'aimed', name: 'Aimed – Carestream Horizon + Trimax', colorClass: 'aimed' },
+  { id: 'ge', name: 'GE – Definium Pace Select + FlashPad', colorClass: 'ge' }
+];
+
+let questionCounter = 0;
+
+// File upload handler
+document.getElementById('csvFile').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  Papa.parse(file, {
+    header: true,
+    skipEmptyLines: true,
+    complete: function(results) {
+      if (results.errors.length > 0) {
+        alert('Error parsing CSV: ' + results.errors[0].message);
+        return;
+      }
+      
+      if (results.data.length === 0) {
+        alert('CSV file is empty or has no data rows.');
+        return;
+      }
+      
+      generateForm(results.data);
+      document.getElementById('reviewForm').classList.add('loaded');
+      document.querySelector('input[name="review_date"]').valueAsDate = new Date();
+    },
+    error: function(error) {
+      alert('Failed to parse CSV file: ' + error.message);
+    }
+  });
+});
+
+function generateForm(data) {
+  const container = document.getElementById('questionsContainer');
+  container.innerHTML = '';
+  questionCounter = 0;
+  
+  const groupedData = groupByCategory(data);
+  
+  Object.keys(groupedData).forEach(category => {
+    const section = createSection(category, groupedData[category]);
+    container.appendChild(section);
+  });
+  
+  initializeProgressTracking();
+}
+
+function groupByCategory(data) {
+  const grouped = {};
+  
+  data.forEach(row => {
+    const category = row[CSV_COLUMNS.CATEGORY] || 'General';
+    
+    if (!grouped[category]) {
+      grouped[category] = [];
+    }
+    
+    grouped[category].push(row);
+  });
+  
+  return grouped;
+}
+
+function createSection(categoryName, questions) {
+  const section = document.createElement('div');
+  section.className = 'section';
+  
+  const title = document.createElement('h2');
+  title.className = 'section-title';
+  title.textContent = categoryName;
+  section.appendChild(title);
+  
+  questions.forEach(questionData => {
+    const questionDiv = createQuestion(questionData);
+    section.appendChild(questionDiv);
+  });
+  
+  return section;
+}
+
+function createQuestion(data) {
+  questionCounter++;
+  
+  const questionDiv = document.createElement('div');
+  questionDiv.className = 'question';
+  
+  const header = document.createElement('div');
+  header.className = 'question-header';
+  
+  const questionText = document.createElement('p');
+  questionText.innerHTML = `<strong>Q${questionCounter}.</strong> ${data[CSV_COLUMNS.QUESTION]}`;
+  header.appendChild(questionText);
+  
+  const criteriaSpan = document.createElement('span');
+  criteriaSpan.className = 'spec';
+  criteriaSpan.textContent = `📌 Evaluation Criteria: ${data[CSV_COLUMNS.CRITERIA]}`;
+  header.appendChild(criteriaSpan);
+  
+  questionDiv.appendChild(header);
+  
+  const machineNotes = createMachineNotes(data);
+  questionDiv.appendChild(machineNotes);
+  
+  const ratingsContainer = document.createElement('div');
+  ratingsContainer.className = 'ratings-container';
+  
+  const ratingsGrid = document.createElement('div');
+  ratingsGrid.className = 'ratings-grid';
+  
+  MACHINES.forEach(machine => {
+    const ratingCard = createMachineRating(machine, questionCounter);
+    ratingsGrid.appendChild(ratingCard);
+  });
+  
+  ratingsContainer.appendChild(ratingsGrid);
+  questionDiv.appendChild(ratingsContainer);
+  
+  return questionDiv;
+}
+
+function createMachineNotes(data) {
+  const notesDiv = document.createElement('div');
+  notesDiv.className = 'machine-notes';
+  
+  const title = document.createElement('div');
+  title.className = 'machine-notes-title';
+  title.textContent = 'Machine Specifications';
+  notesDiv.appendChild(title);
+  
+  const specsGrid = document.createElement('div');
+  specsGrid.className = 'specs-grid';
+  
+  if (data[CSV_COLUMNS.BULLSEYE_SPEC]) {
+    specsGrid.appendChild(createSpecItem('bullseye', 'BullsEye', data[CSV_COLUMNS.BULLSEYE_SPEC]));
+  }
+  
+  if (data[CSV_COLUMNS.AIMED_SPEC]) {
+    specsGrid.appendChild(createSpecItem('aimed', 'Aimed', data[CSV_COLUMNS.AIMED_SPEC]));
+  }
+  
+  if (data[CSV_COLUMNS.GE_SPEC]) {
+    specsGrid.appendChild(createSpecItem('ge', 'GE', data[CSV_COLUMNS.GE_SPEC]));
+  }
+  
+  notesDiv.appendChild(specsGrid);
+  return notesDiv;
+}
+
+function createSpecItem(colorClass, machineName, specValue) {
+  const item = document.createElement('div');
+  item.className = 'spec-item';
+  
+  const machineDiv = document.createElement('div');
+  machineDiv.className = `spec-machine ${colorClass}`;
+  machineDiv.textContent = machineName;
+  item.appendChild(machineDiv);
+  
+  const valueDiv = document.createElement('div');
+  valueDiv.className = 'spec-value';
+  valueDiv.textContent = specValue;
+  item.appendChild(valueDiv);
+  
+  return item;
+}
+
+function createMachineRating(machine, questionNum) {
+  const card = document.createElement('div');
+  card.className = `machine-rating ${machine.colorClass}`;
+  
+  const title = document.createElement('div');
+  title.className = 'machine-rating-title';
+  title.textContent = machine.name;
+  card.appendChild(title);
+  
+  const scaleOptions = document.createElement('div');
+  scaleOptions.className = 'scale-options';
+  
+  for (let i = 0; i <= 5; i++) {
+    const label = document.createElement('label');
+    
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = `q${questionNum}_${machine.id}`;
+    radio.value = i;
+    if (i === 0) radio.required = true;
+    label.appendChild(radio);
+    
+    const span = document.createElement('span');
+    span.textContent = i;
+    label.appendChild(span);
+    
+    scaleOptions.appendChild(label);
+  }
+  
+  card.appendChild(scaleOptions);
+  
+  const legend = document.createElement('div');
+  legend.className = 'scale-legend';
+  legend.innerHTML = '<span>Worst</span><span>Best</span>';
+  card.appendChild(legend);
+  
+  return card;
+}
+
+function initializeProgressTracking() {
+  const radios = document.querySelectorAll('input[type="radio"]');
+  radios.forEach(radio => {
+    radio.addEventListener('change', updateProgress);
+  });
+  updateProgress();
+}
+
+function updateProgress() {
+  const form = document.getElementById('reviewForm');
+  const radioGroups = {};
+  const radios = form.querySelectorAll('input[type="radio"]');
+  
+  radios.forEach(radio => {
+    if (!radioGroups[radio.name]) {
+      radioGroups[radio.name] = false;
+    }
+    if (radio.checked) {
+      radioGroups[radio.name] = true;
+    }
+  });
+  
+  const totalGroups = Object.keys(radioGroups).length;
+  const completedGroups = Object.values(radioGroups).filter(v => v).length;
+  const percentage = totalGroups > 0 ? Math.round((completedGroups / totalGroups) * 100) : 0;
+  
+  document.getElementById('progressFill').style.width = percentage + '%';
+  document.getElementById('progressText').textContent = percentage + '% Complete';
+}
+
+document.getElementById('reviewForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const formData = new FormData(this);
+  const data = {};
+  
+  for (let [key, value] of formData.entries()) {
+    data[key] = value;
+  }
+  
+  console.log('Form Data:', data);
+  alert('✅ Review submitted successfully!\n\nThank you for your evaluation.\n\nCheck the browser console for form data.');
+});
+</script>
+</body>
+</html>

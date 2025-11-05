@@ -1,0 +1,227 @@
+ROSES Prompt: Firebase Form → Google Sheets Integration
+
+For the next plan, creat a do get and post function (if this are the method needed for saving the reviewers rating in the google sheet) in my index.html that will saved the answers in google sheet.
+The goal is to be able to record the responses in google sheet
+
+1. Create a function for both index.html an Code.gs (for google appscript) to communicate, to be able to perform Get and Post function.
+2. Make a step by step guide on what should the google sheet format look like base on the data in the .csv so that its easily to save the responses and grade/total it later.
+3. Make changes base on the next plan tha i want, and integrate those changes into the current system so that it works properly
+
+🧩 Plan 2 — Save Form Responses to Google Sheet using Google Apps Script
+🧠 Goal
+
+To make your index.html form (from Plan 1) save responses directly to Google Sheets using Google Apps Script (Code.gs) — storing ratings as pure numbers for easy grading, calculation, and reporting later.
+
+ROSES Prompt: Firebase Form → Google Sheets Integration
+🔹 R — Role
+
+You are a web developer and Google Apps Script integration expert.
+You specialize in connecting static HTML forms hosted on Firebase (or any static server) with Google Sheets using Google Apps Script web apps.
+You write clean HTML, JavaScript, and Apps Script code that is:
+
+Secure and easy to follow.
+
+Commented for beginners.
+
+Designed to record responses in a clear, numeric format for analytics.
+
+🔹 O — Objective
+
+Create a complete, ready-to-use setup that allows:
+
+Submitting form data from index.html (ratings, IDs, or answers).
+
+Saving each response as a new row in Google Sheets (all numeric values).
+
+Using Google Apps Script as the middleware with doPost() and doGet() functions.
+
+Making it easy to grade, total, and report scores later in the spreadsheet.
+
+Including step-by-step setup instructions for linking Google Sheets and Apps Script.
+
+🔹 S — Scenario
+
+You already have:
+
+index.html → a form dynamically generated from a CSV file.
+
+It runs in a Firebase static environment.
+
+Now, you’ll extend it to send the responses to a Google Sheet.
+
+Constraints & Tools:
+
+No backend server (only Firebase Hosting + Google Apps Script).
+
+Use fetch() in JavaScript to send form data to the Google Apps Script web app URL.
+
+Responses are numbers only (ratings or scores).
+
+Each submission should:
+
+Append to a new row in Google Sheets.
+
+Include timestamp, question IDs (optional), and numeric ratings.
+
+🔹 E — Expected Solution
+
+Your final output must include:
+
+1. Short Overview (in layman’s terms)
+
+Explain how the HTML form communicates with Google Sheets through a small Apps Script web app.
+
+2. Updated index.html Code
+
+Add JavaScript that:
+
+Collects form data when “Submit” is clicked.
+
+Converts all values to numbers.
+
+Sends data to the Apps Script endpoint using fetch() (POST).
+
+Shows a success message after saving.
+
+Include comments explaining:
+
+How to change the Apps Script web app URL.
+
+How data is structured before sending.
+
+3. Code.gs (Google Apps Script)
+
+A full script example that:
+
+Defines both doGet(e) and doPost(e) functions.
+
+Parses incoming POST data.
+
+Appends it to the Google Sheet in numeric format.
+
+Returns a JSON response confirming the save.
+
+Example structure:
+
+function doPost(e) {
+  var ss = SpreadsheetApp.openById('YOUR_SHEET_ID');
+  var sheet = ss.getSheetByName('Responses');
+  var data = JSON.parse(e.postData.contents);
+
+  var row = [new Date()];
+  data.answers.forEach(function(ans) {
+    row.push(Number(ans)); // ensure numeric
+  });
+
+  sheet.appendRow(row);
+  return ContentService.createTextOutput(
+    JSON.stringify({status: 'success'})
+  ).setMimeType(ContentService.MimeType.JSON);
+}
+
+4. Google Sheet Format Guide
+
+Step-by-step explanation:
+
+Create a new Google Sheet named Xray_Responses.
+
+Add a sheet/tab named Responses.
+
+Header row example:
+| Timestamp | Q1 | Q2 | Q3 | Q4 | Q5 | Total |
+
+Each response submission adds a new row like:
+| 11/05/2025 10:12 | 4 | 3 | 5 | 2 | 4 | (calculated via formula) |
+
+(Optional) Add a “Total” formula in column G:
+
+=SUM(B2:F2)
+
+5. Step-by-Step Setup Instructions
+
+Simple instructions for users:
+
+A. Create Google Apps Script
+
+Go to script.google.com
+.
+
+Create a new project.
+
+Paste in the Code.gs code.
+
+Replace 'YOUR_SHEET_ID' with your actual Sheet ID.
+
+Deploy as a web app:
+
+Go to Deploy → New Deployment.
+
+Choose Web app.
+
+Set access to: “Anyone with the link.”
+
+Copy the web app URL.
+
+B. Update HTML form
+
+In index.html, replace const SCRIPT_URL with your web app URL.
+
+Deploy your updated index.html in Firebase.
+
+C. Test Submission
+
+Open your Firebase form in the browser.
+
+Fill in responses and click “Submit”.
+
+Check your Google Sheet — a new row should appear.
+
+6. Error Handling & Validation
+
+Add small code in HTML to:
+
+Prevent blank submissions.
+
+Show success/error messages.
+
+7. Optional Future Improvements
+
+Add user IDs or session IDs.
+
+Calculate totals automatically in Apps Script.
+
+Export summary reports.
+
+Add visual dashboards in Sheets.
+
+🔹 S — Steps (For the AI / Developer)
+
+Start with the existing index.html from Plan 1.
+
+Add JS code to:
+
+Gather data → Convert to JSON → Send to Apps Script (POST).
+
+Write a matching Code.gs with doPost() and doGet() handlers.
+
+Provide:
+
+Full working code samples for both files.
+
+Setup instructions for Sheets and Apps Script.
+
+Ensure all responses are numeric.
+
+Output in this order:
+
+Overview
+
+index.html code
+
+Code.gs code
+
+Google Sheet setup guide
+
+Instructions (text form)
+
+Optional improvements

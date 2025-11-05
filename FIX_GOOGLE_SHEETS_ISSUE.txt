@@ -1,0 +1,280 @@
+================================================================================
+🔧 FIX: FORM SUBMITTING BUT DATA NOT APPEARING IN GOOGLE SHEETS
+================================================================================
+
+ISSUE DIAGNOSED:
+Your form is successfully sending data (confirmed by browser console), but the 
+data isn't appearing in your Google Sheet. This is because the Apps Script 
+validation was checking for the wrong field name.
+
+================================================================================
+WHAT WAS FIXED:
+================================================================================
+
+✅ FIXED: Code.gs line 143
+   Changed: if (!data.reviewer_name || !data.affiliation || ...)
+   To:      if (!data.reviewer_name || !data.reviewer_role || ...)
+   
+   The form sends "reviewer_role" but Code.gs was checking for "affiliation"
+   This caused the validation to fail silently.
+
+================================================================================
+STEP-BY-STEP FIX INSTRUCTIONS:
+================================================================================
+
+STEP 1: UPDATE YOUR APPS SCRIPT
+--------------------------------
+1. Go to: https://script.google.com/home
+2. Find your project (should be named "X-ray Machine Evaluation Form")
+3. Click on it to open the Apps Script editor
+4. In the left panel, click on "Code.gs"
+5. Find line 143 (inside the doPost function)
+6. Look for this code:
+   
+   if (!data.reviewer_name || !data.affiliation || !data.review_date || !data.ratings) {
+
+7. Replace it with:
+   
+   if (!data.reviewer_name || !data.reviewer_role || !data.review_date || !data.ratings) {
+
+8. Click the 💾 Save icon (or press Ctrl+S)
+9. Click "Deploy" > "Test deployments" to test
+10. Then click "Deploy" > "Manage deployments"
+11. Click the pencil ✏️ icon to edit your deployment
+12. Under "Version", select "New version"
+13. Click "Deploy"
+14. Copy the new Web App URL (should be the same, just updated)
+
+
+STEP 2: VERIFY SHEET PERMISSIONS
+---------------------------------
+1. Open your Google Sheet:
+   https://docs.google.com/spreadsheets/d/1i16GiklESSHyP89rVRhlyNwqcteohc9F0Dk7osFnwSk/edit
+
+2. Make sure the sheet has a tab named "Responses"
+   - If not, create a new sheet tab and rename it to "Responses"
+
+3. Check sheet permissions:
+   - Click the "Share" button (top right)
+   - Make sure "Anyone with the link" can VIEW
+   - (The Apps Script needs to be able to write to it)
+
+
+STEP 3: TEST THE SCRIPT DIRECTLY
+---------------------------------
+1. In the Apps Script editor, find the function dropdown (top toolbar)
+2. Select "testFormSubmission"
+3. Click the ▶️ Run button
+4. If prompted for authorization:
+   - Click "Review Permissions"
+   - Choose your Google account
+   - Click "Advanced"
+   - Click "Go to [Project Name] (unsafe)"
+   - Click "Allow"
+5. Check the Execution log (bottom of screen)
+6. Go to your Google Sheet and verify a test row was added
+
+
+STEP 4: TEST FROM YOUR FORM
+----------------------------
+1. Make sure you've saved the updated Code.gs
+2. Make sure you've redeployed with "New version"
+3. Open your index.html in a browser
+4. Fill out the form completely:
+   - Reviewer Name: Test User
+   - Role/Position: Test Role
+   - Review Date: Today's date
+   - Rate all machines (at least give them all a score)
+5. Click "Submit Review"
+6. You should see: "✅ Evaluation Saved Successfully!"
+7. Go to your Google Sheet immediately
+8. Refresh the page
+9. You should see a new row with your data
+
+
+STEP 5: TROUBLESHOOTING
+------------------------
+
+If data STILL doesn't appear after fixing Code.gs:
+
+A. CHECK APPS SCRIPT EXECUTION LOG:
+   1. In Apps Script editor, click "Executions" (left sidebar, clock icon)
+   2. Look for recent executions
+   3. If you see "Failed" status, click it to see the error
+   4. Common errors:
+      - "Authorization required" → Run testFormSubmission and authorize
+      - "Spreadsheet not found" → Check SHEET_ID in Code.gs line 16
+      - "Sheet not found" → Make sure "Responses" tab exists
+
+B. CHECK WEB APP DEPLOYMENT:
+   1. In Apps Script, click "Deploy" > "Manage deployments"
+   2. Verify:
+      - Execute as: Me (your email)
+      - Who has access: Anyone
+   3. Copy the Web App URL
+   4. Make sure it matches GOOGLE_SCRIPT_URL in index.html line 615
+
+C. CHECK BROWSER CONSOLE FOR ERRORS:
+   1. Open index.html in browser
+   2. Press F12 to open DevTools
+   3. Go to "Console" tab
+   4. Submit the form
+   5. Look for any red error messages
+   6. If you see CORS errors, that's NORMAL (no-cors mode)
+   7. If you see "Data sent to Google Sheets successfully", form is working
+
+D. VERIFY SHEET ID:
+   1. Open your Google Sheet
+   2. Look at the URL:
+      https://docs.google.com/spreadsheets/d/[SHEET_ID]/edit
+   3. Copy the SHEET_ID part (long string between /d/ and /edit)
+   4. In Code.gs line 16, verify SHEET_ID matches
+   5. Your current ID: 1i16GiklESSHyP89rVRhlyNwqcteohc9F0Dk7osFnwSk
+
+E. TEST WITH CURL (Advanced):
+   Open PowerShell and run:
+   
+   $body = @{
+     reviewer_name = "Test User"
+     reviewer_role = "Test Role"
+     review_date = "2025-11-05"
+     ratings = @{
+       q1_bullseye = 3
+       q1_aimed = 4
+       q1_ge = 5
+     }
+   } | ConvertTo-Json
+   
+   Invoke-WebRequest -Uri "YOUR_WEB_APP_URL" -Method POST -Body $body -ContentType "application/json"
+
+================================================================================
+EXPECTED RESULT AFTER FIX:
+================================================================================
+
+✅ Form submits successfully
+✅ Console shows: "Data sent to Google Sheets successfully"
+✅ Alert message: "✅ Evaluation Saved Successfully!"
+✅ New row appears in Google Sheet "Responses" tab
+✅ Row contains: Timestamp, Name, Role, Date, 84 ratings, 3 totals, grand total
+
+================================================================================
+YOUR CURRENT CONFIGURATION:
+================================================================================
+
+Sheet ID: 1i16GiklESSHyP89rVRhlyNwqcteohc9F0Dk7osFnwSk
+
+Web App URL: 
+https://script.google.com/macros/s/AKfycbxCfQvNtUuuaVU4k7z-JOcLGEF_dPbbGr7LmISt-_eylyeCF6yMD9rRqomSBCCssM-G/exec
+
+Sheet Tab Name: Responses
+
+Expected Columns: 91 total
+- Column A: Timestamp
+- Column B: Reviewer Name
+- Column C: Role/Position
+- Column D: Review Date
+- Columns E-CL: 84 ratings (28 questions × 3 machines)
+- Column CM: BullsEye Total
+- Column CN: Aimed Total
+- Column CO: GE Total
+- Column CP: Grand Total
+
+================================================================================
+STILL HAVING ISSUES?
+================================================================================
+
+If after following ALL steps above, data still doesn't appear:
+
+1. Check if Apps Script execution log shows "Success" but no data appears:
+   → The sheet might be filtering/hiding rows
+   → Try clearing all filters in the sheet
+   → Check if data went to a different sheet tab
+
+2. Check if you get "Authorization required" errors:
+   → You MUST authorize the script by running testFormSubmission first
+   → This gives the script permission to write to your sheet
+
+3. Check if the sheet is owned by a different Google account:
+   → Make sure you're logged into the SAME account that owns both:
+     - The Google Sheet
+     - The Apps Script project
+   → If they're different accounts, you'll need to authorize properly
+
+4. Create a new test submission:
+   → Use simple data (no special characters)
+   → Rate only the first 3 questions, leave rest as 0
+   → This simplifies debugging
+
+5. Check Google Sheet revision history:
+   → File > Version history > See version history
+   → This will show if ANY data was written to the sheet
+
+================================================================================
+TESTING LOCALLY
+================================================================================
+
+To run and test your form locally:
+
+METHOD 1: Python HTTP Server (Recommended)
+-------------------------------------------
+1. Open PowerShell
+2. Navigate to your project folder:
+   cd "C:\Users\Lifecare IT Admin\Documents\Programming\XRAY_HTML_Form"
+
+3. Start server:
+   python -m http.server 8000
+   
+4. Open browser to: http://localhost:8000/index.html
+
+5. Fill out and submit the form
+
+6. Check your Google Sheet for the new data
+
+
+METHOD 2: VS Code Live Server
+------------------------------
+1. Install "Live Server" extension in VS Code
+2. Right-click on index.html
+3. Click "Open with Live Server"
+4. Fill out and submit the form
+5. Check your Google Sheet
+
+
+METHOD 3: Direct File Opening (Limited)
+----------------------------------------
+1. Double-click index.html to open in browser
+2. This works, but some features might be limited
+3. CORS might cause issues
+4. Better to use Methods 1 or 2
+
+================================================================================
+FINAL CHECKLIST:
+================================================================================
+
+Before testing, verify:
+
+☐ Code.gs line 143 uses "reviewer_role" not "affiliation"
+☐ Code.gs is saved in Apps Script editor
+☐ Apps Script is redeployed with "New version"
+☐ Web App URL in index.html matches deployed URL
+☐ Sheet ID in Code.gs matches your Google Sheet ID
+☐ Google Sheet has a tab named "Responses"
+☐ You've run testFormSubmission and authorized the script
+☐ Apps Script execution log shows successful test run
+☐ You're logged into the correct Google account
+
+After testing:
+
+☐ Form shows success message
+☐ Browser console shows "Data sent to Google Sheets successfully"
+☐ Google Sheet "Responses" tab has new row
+☐ New row has timestamp, name, role, date, and ratings
+☐ Total columns show correct sums
+
+================================================================================
+
+If you've completed all steps and it's still not working, there may be an
+account permission issue. Try creating a NEW Apps Script project from scratch
+using the exact Code.gs from your folder.
+
+================================================================================

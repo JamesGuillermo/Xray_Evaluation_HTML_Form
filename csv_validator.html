@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSV Structure Validator</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+    background: #f5f5f5;
+  }
+  h1 {
+    color: #333;
+    text-align: center;
+  }
+  .upload-section {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  .file-input {
+    display: none;
+  }
+  .upload-button {
+    background: #2563eb;
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    display: inline-block;
+  }
+  .upload-button:hover {
+    background: #1d4ed8;
+  }
+  .results {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    display: none;
+  }
+  .success {
+    color: #10b981;
+    font-weight: bold;
+    padding: 15px;
+    background: #d1fae5;
+    border-radius: 6px;
+    margin-bottom: 20px;
+  }
+  .error {
+    color: #ef4444;
+    font-weight: bold;
+    padding: 15px;
+    background: #fee2e2;
+    border-radius: 6px;
+    margin-bottom: 20px;
+  }
+  .info-box {
+    background: #eff6ff;
+    border-left: 4px solid #2563eb;
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  th, td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+  th {
+    background: #f3f4f6;
+    font-weight: bold;
+  }
+  tr:hover {
+    background: #f9fafb;
+  }
+  .check-icon {
+    color: #10b981;
+    font-size: 20px;
+  }
+  .warning-icon {
+    color: #f59e0b;
+    font-size: 20px;
+  }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+  }
+  .stat-card {
+    background: #f9fafb;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+  }
+  .stat-number {
+    font-size: 36px;
+    font-weight: bold;
+    color: #2563eb;
+  }
+  .stat-label {
+    color: #6b7280;
+    margin-top: 5px;
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+<h1>📋 CSV Structure Validator</h1>
+<p style="text-align: center; color: #6b7280;">
+  Upload your CSV file to verify it's properly formatted for the X-ray Review Form
+</p>
+
+<div class="upload-section">
+  <input type="file" id="csvFile" class="file-input" accept=".csv">
+  <label for="csvFile" class="upload-button">
+    📁 Choose CSV File
+  </label>
+  <p style="margin-top: 15px; color: #6b7280;">
+    Select: Xray_Evaluation_Questions_Simple.csv
+  </p>
+</div>
+
+<div class="results" id="results"></div>
+
+<script>
+const REQUIRED_COLUMNS = [
+  "What it's about",
+  "What to check",
+  "Your rating question (0–5)",
+  "BullsEye machine (what the papers say)",
+  "Aimed machine (what the papers say)",
+  "GE machine (what the papers say)"
+];
+
+document.getElementById('csvFile').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  Papa.parse(file, {
+    header: true,
+    skipEmptyLines: true,
+    complete: function(results) {
+      validateCSV(results);
+    },
+    error: function(error) {
+      showError('Failed to parse CSV: ' + error.message);
+    }
+  });
+});
+
+function validateCSV(results) {
+  const resultsDiv = document.getElementById('results');
+  resultsDiv.style.display = 'block';
+  resultsDiv.innerHTML = '';
+  
+  const headers = results.meta.fields || [];
+  const data = results.data;
+  const errors = [];
+  const warnings = [];
+  
+  // Check for required columns
+  const missingColumns = REQUIRED_COLUMNS.filter(col => !headers.includes(col));
+  const extraColumns = headers.filter(col => !REQUIRED_COLUMNS.includes(col));
+  
+  if (missingColumns.length > 0) {
+    errors.push(`Missing required columns: ${missingColumns.join(', ')}`);
+  }
+  
+  if (extraColumns.length > 0) {
+    warnings.push(`Extra columns found (will be ignored): ${extraColumns.join(', ')}`);
+  }
+  
+  // Check for empty rows
+  const emptyRows = data.filter(row => {
+    return Object.values(row).every(val => !val || val.trim() === '');
+  }).length;
+  
+  // Check for missing data
+  let rowsWithMissingData = 0;
+  data.forEach((row, index) => {
+    const missingFields = REQUIRED_COLUMNS.filter(col => !row[col] || row[col].trim() === '');
+    if (missingFields.length > 0) {
+      rowsWithMissingData++;
+      if (rowsWithMissingData <= 5) {
+        warnings.push(`Row ${index + 2}: Missing data in columns: ${missingFields.join(', ')}`);
+      }
+    }
+  });
+  
+  if (rowsWithMissingData > 5) {
+    warnings.push(`... and ${rowsWithMissingData - 5} more rows with missing data`);
+  }
+  
+  // Group by category
+  const categories = {};
+  data.forEach(row => {
+    const category = row[REQUIRED_COLUMNS[0]] || 'Uncategorized';
+    if (!categories[category]) {
+      categories[category] = 0;
+    }
+    categories[category]++;
+  });
+  
+  // Display results
+  if (errors.length === 0) {
+    resultsDiv.innerHTML += `
+      <div class="success">
+        <span class="check-icon">✓</span> CSV structure is valid!
+      </div>
+    `;
+  } else {
+    resultsDiv.innerHTML += `
+      <div class="error">
+        <span>✗</span> CSV has errors that must be fixed:
+        <ul>${errors.map(e => '<li>' + e + '</li>').join('')}</ul>
+      </div>
+    `;
+  }
+  
+  if (warnings.length > 0) {
+    resultsDiv.innerHTML += `
+      <div class="info-box">
+        <strong>⚠ Warnings:</strong>
+        <ul>${warnings.map(w => '<li>' + w + '</li>').join('')}</ul>
+      </div>
+    `;
+  }
+  
+  // Statistics
+  resultsDiv.innerHTML += `
+    <h2>📊 Statistics</h2>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-number">${data.length}</div>
+        <div class="stat-label">Total Questions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">${Object.keys(categories).length}</div>
+        <div class="stat-label">Categories</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">${headers.length}</div>
+        <div class="stat-label">Columns</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">${data.length * 3}</div>
+        <div class="stat-label">Rating Inputs</div>
+      </div>
+    </div>
+  `;
+  
+  // Column headers check
+  resultsDiv.innerHTML += `
+    <h2>📋 Column Headers</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Required Column</th>
+          <th>Status</th>
+          <th>Found As</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${REQUIRED_COLUMNS.map(col => {
+          const found = headers.includes(col);
+          return `
+            <tr>
+              <td>${col}</td>
+              <td>${found ? '<span class="check-icon">✓</span>' : '<span style="color:#ef4444">✗</span>'}</td>
+              <td>${found ? col : '<em>Not found</em>'}</td>
+            </tr>
+          `;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+  
+  // Questions by category
+  resultsDiv.innerHTML += `
+    <h2>📑 Questions by Category</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Number of Questions</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${Object.entries(categories).map(([cat, count]) => `
+          <tr>
+            <td>${cat}</td>
+            <td>${count}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+  
+  // Sample data
+  if (data.length > 0) {
+    resultsDiv.innerHTML += `
+      <h2>👀 Sample Questions (First 3)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Category</th>
+            <th>Question</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.slice(0, 3).map((row, index) => `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${row[REQUIRED_COLUMNS[0]] || '<em>Missing</em>'}</td>
+              <td>${row[REQUIRED_COLUMNS[2]] || '<em>Missing</em>'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+  
+  // Final verdict
+  if (errors.length === 0) {
+    resultsDiv.innerHTML += `
+      <div class="success" style="margin-top: 30px;">
+        ✓ This CSV file is ready to use with the X-ray Review Form!<br>
+        Copy it to your Firebase "public" folder and deploy.
+      </div>
+    `;
+  } else {
+    resultsDiv.innerHTML += `
+      <div class="error" style="margin-top: 30px;">
+        ✗ Please fix the errors above before using this CSV file.<br>
+        Re-export from Excel and make sure all column headers match exactly.
+      </div>
+    `;
+  }
+}
+
+function showError(message) {
+  const resultsDiv = document.getElementById('results');
+  resultsDiv.style.display = 'block';
+  resultsDiv.innerHTML = `
+    <div class="error">
+      ${message}
+    </div>
+  `;
+}
+</script>
+</body>
+</html>

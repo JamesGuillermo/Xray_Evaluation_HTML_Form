@@ -1,0 +1,252 @@
+================================================================================
+⚡ QUICKSTART GUIDE - GOOGLE SHEETS INTEGRATION
+================================================================================
+For experienced users who want to get started quickly.
+For detailed instructions, see DEPLOYMENT_INSTRUCTIONS.txt
+================================================================================
+
+🎯 GOAL: Connect your X-ray evaluation form to Google Sheets in 30 minutes
+
+================================================================================
+STEP 1: CREATE GOOGLE SHEET (5 minutes)
+================================================================================
+
+1. Go to: https://sheets.google.com
+2. Click: "+ Blank"
+3. Name it: "Xray_Machine_Evaluations"
+4. Rename tab: "Responses"
+5. Copy Sheet ID from URL (between /d/ and /edit)
+6. Click "Share" → "Anyone with the link" → "Done"
+
+Your Sheet ID looks like: 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms
+
+================================================================================
+STEP 2: DEPLOY APPS SCRIPT (15 minutes)
+================================================================================
+
+1. In your Google Sheet: Extensions → Apps Script
+2. Delete default code
+3. Open Code.gs from your project folder
+4. Copy ALL the code and paste into Apps Script editor
+5. Find line: const SHEET_ID = 'YOUR_GOOGLE_SHEET_ID_HERE';
+6. Replace with your actual Sheet ID (keep the quotes)
+7. Save: Ctrl+S (name project: "Xray Form Backend")
+8. Function dropdown → Select "testSheetAccess"
+9. Click Run (▶️)
+10. Grant permissions when prompted:
+    - Review permissions
+    - Choose your account
+    - Advanced → Go to Xray Form Backend (unsafe)
+    - Allow
+11. Check logs: View → Logs (should show "Successfully accessed sheet")
+12. Function dropdown → Select "testFormSubmission"
+13. Click Run
+14. Check your Google Sheet - should have test data row (delete it)
+15. Click: Deploy → New deployment
+16. Click gear icon → Select type: Web app
+17. Description: "X-ray Form Submission Handler"
+18. Execute as: Me
+19. Who has access: Anyone
+20. Click Deploy (authorize again if prompted)
+21. COPY the web app URL (save it - you need this!)
+
+URL format: https://script.google.com/macros/s/AKfycbw.../exec
+
+================================================================================
+STEP 3: UPDATE HTML FORM (3 minutes)
+================================================================================
+
+1. Open index.html in text editor (VS Code, Notepad++, etc.)
+2. Find (around line 610-615):
+   const GOOGLE_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
+3. Replace with your web app URL from Step 2
+4. Keep the quotes!
+5. Save file: Ctrl+S
+
+Example:
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw1234567890/exec';
+
+================================================================================
+STEP 4: TEST (5 minutes)
+================================================================================
+
+1. Open terminal/command prompt in your project folder
+2. Run: python -m http.server 8000
+   OR double-click: start_server.bat (Windows)
+3. Open browser: http://localhost:8000/index.html
+4. Fill out form:
+   - Name: "Test User"
+   - Affiliation: "Test Hospital"
+   - Date: Today
+   - Rate all questions (can use all 3s for quick test)
+5. Click "Submit Evaluation"
+6. Should see: "⏳ Saving to Google Sheets..."
+7. Then: "✅ Evaluation Saved Successfully!"
+8. Go to your Google Sheet
+9. Refresh (F5)
+10. Should see new row with your test data
+11. Verify totals calculate (columns CM, CN, CO, CP)
+
+If using all 3s: Each total should be 84, Grand total 252
+
+================================================================================
+STEP 5: DEPLOY (varies)
+================================================================================
+
+Choose ONE method:
+
+METHOD A - Firebase Hosting (Professional):
+   1. npm install -g firebase-tools
+   2. firebase login
+   3. firebase init hosting
+   4. firebase deploy
+   5. Access at: https://your-project.firebaseapp.com/index.html
+
+METHOD B - Network Share (Internal):
+   1. Copy all project files to shared network folder
+   2. Users open: \\server\share\xray-form\index.html
+   3. Needs internet when submitting
+
+METHOD C - GitHub Pages (Free):
+   1. Create GitHub repository
+   2. Upload all files
+   3. Settings → Pages → Enable
+   4. Access at: https://username.github.io/repo-name/index.html
+
+METHOD D - Web Server (IT Department):
+   1. Copy files to web server directory
+   2. Configure server to serve HTML
+   3. Access via: http://intranet.hospital.local/xray-form/
+
+================================================================================
+✅ SUCCESS CHECKLIST
+================================================================================
+
+□ Google Sheet created with "Responses" tab
+□ Apps Script deployed with "Anyone" access
+□ Web app URL copied and saved
+□ index.html updated with correct URL
+□ Test submission successful
+□ Data appears in Google Sheet
+□ Totals calculate correctly
+□ Form deployed and accessible to users
+
+================================================================================
+❌ TROUBLESHOOTING
+================================================================================
+
+PROBLEM: "Failed to load CSV file"
+SOLUTION: Use web server (http://), not file:// protocol
+→ Run: python -m http.server 8000
+→ Or use: start_server.bat
+
+PROBLEM: "Error Saving to Google Sheets"
+SOLUTION: Check web app URL
+→ Must end with /exec
+→ No extra spaces
+→ Verify Apps Script deployed with "Anyone" access
+
+PROBLEM: #REF! errors in sheet totals
+SOLUTION: Delete test rows and resubmit
+→ Apps Script will recreate formulas correctly
+
+PROBLEM: Data in wrong columns
+SOLUTION: Clear sheet and let Code.gs auto-create headers
+→ Delete all rows
+→ Submit test form
+→ Headers created automatically
+
+For detailed troubleshooting, see: TESTING_AND_TROUBLESHOOTING.txt
+
+================================================================================
+📚 DOCUMENTATION
+================================================================================
+
+GOOGLE_SHEETS_OVERVIEW.txt
+→ How the system works (layman's terms)
+→ Benefits and use cases
+→ FAQ
+
+GOOGLE_SHEET_SETUP.txt
+→ Detailed sheet structure
+→ All 91 columns explained
+→ Formula explanations
+→ Analysis tips
+
+DEPLOYMENT_INSTRUCTIONS.txt
+→ Complete step-by-step guide
+→ 6-part deployment process
+→ All deployment options
+→ Common issues and solutions
+
+TESTING_AND_TROUBLESHOOTING.txt
+→ Comprehensive testing guide
+→ 13 test procedures
+→ Error message reference
+→ Debugging tools
+→ Validation scripts
+
+PLAN_V2_DELIVERY_SUMMARY.txt
+→ Complete package overview
+→ All deliverables listed
+→ Technical specifications
+→ Requirements fulfillment
+
+================================================================================
+🎓 KEY FILES
+================================================================================
+
+index.html
+→ Main form file (updated with Google Sheets integration)
+→ Configure: GOOGLE_SCRIPT_URL constant
+
+Code.gs
+→ Google Apps Script backend
+→ Configure: SHEET_ID constant
+
+Xray_Evaluation_Questions_Simple.csv
+→ Data source (28 questions, 3 machines)
+→ No changes needed
+
+csv_validator.html
+→ Validates CSV structure
+→ Use before deployment if CSV is modified
+
+================================================================================
+💡 QUICK TIPS
+================================================================================
+
+✓ Test Locally First: Use start_server.bat before deploying
+✓ Keep Backup: Save web app URL in safe place
+✓ Monitor Sheet: Check occasionally for data integrity
+✓ Email Alerts: Enable in Code.gs for notifications
+✓ Regular Testing: Submit test evaluation monthly
+✓ Export Backups: Download sheet as Excel periodically
+✓ User Training: Share form URL and basic instructions
+
+================================================================================
+🚀 READY TO GO!
+================================================================================
+
+Your form is now connected to Google Sheets!
+
+What happens when someone submits:
+1. Form validates data (required fields, all ratings)
+2. JavaScript converts to JSON with numeric ratings
+3. POST request sent to your Apps Script
+4. Apps Script appends row to Google Sheet
+5. Totals calculate automatically
+6. User sees success message
+7. You see new row in sheet
+
+All done automatically. No manual intervention needed! 🎊
+
+For support, check the detailed documentation files.
+
+Good luck with your X-ray machine evaluations! 📊
+
+================================================================================
+Document: QUICKSTART_GOOGLE_SHEETS.txt
+Version: 2.0
+Date: November 5, 2025
+================================================================================

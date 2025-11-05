@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>X-ray Machine Desk Review Form</title>
+<style>
+  body { font-family: Arial, sans-serif; background:#f5f5f5; padding:20px; }
+  h1, h2 { text-align:left; }
+  form { background:#fff; padding:20px; border-radius:10px; max-width:1100px; margin:0 auto; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+  .intro { margin-bottom:20px; }
+  .section { margin:30px 0; padding:15px; border-radius:8px; background:#fafafa; border:1px solid #e0e0e0; }
+  .section-title { margin-top:0; }
+  .question { margin-bottom:20px; padding-bottom:15px; border-bottom:1px dashed #ddd; }
+  .question:last-child { border-bottom:none; }
+  .spec { font-size:0.9em; color:#555; margin-bottom:8px; }
+  .machine-notes { font-size:0.85em; color:#444; margin:6px 0 10px 0; }
+  .machine-notes ul { margin:4px 0 0 18px; padding:0; }
+  .machine-notes li { margin:2px 0; }
+  .ratings { display:flex; flex-wrap:wrap; gap:16px; }
+  .machine-rating { flex:1 1 250px; padding:8px; background:#fff; border-radius:6px; border:1px solid #ddd; }
+  .machine-rating-title { font-weight:bold; margin-bottom:4px; }
+  .scale-label { font-size:0.8em; color:#666; margin-bottom:4px; }
+  .scale-options { display:flex; flex-wrap:wrap; gap:4px; }
+  .scale-options label { font-size:0.85em; padding:2px 4px; }
+  .reviewer-info { display:flex; flex-wrap:wrap; gap:16px; margin-bottom:20px; }
+  .reviewer-info > div { flex:1 1 200px; }
+  input[type="text"], input[type="date"] { width:100%; padding:6px 8px; border-radius:4px; border:1px solid #ccc; }
+  .submit-row { text-align:right; margin-top:20px; }
+  button[type="submit"] { padding:10px 18px; border:none; border-radius:6px; background:#1976d2; color:#fff; font-size:1rem; cursor:pointer; }
+  button[type="submit"]:hover { background:#125aa3; }
+</style>
+</head>
+<body>
+<h1>X-ray Machine Desk Review – Rating Form</h1>
+<form>
+  <div class="intro">
+    <p><strong>How to rate:</strong> For every question, give a score from <strong>0 to 5</strong> for each machine.</p>
+    <ul>
+      <li>0 = very bad</li>
+      <li>1 = bad</li>
+      <li>2 = okay</li>
+      <li>3 = good</li>
+      <li>4 = very good</li>
+      <li>5 = excellent</li>
+    </ul>
+  </div>
+  <div class="reviewer-info">
+    <div>
+      <label>Reviewer name:<br><input type="text" name="reviewer_name"></label>
+    </div>
+    <div>
+      <label>Role / position:<br><input type="text" name="reviewer_role"></label>
+    </div>
+    <div>
+      <label>Date:<br><input type="date" name="review_date"></label>
+    </div>
+  </div>
+
+  <!-- SECTION: IMAGE QUALITY (example of first two questions) -->
+  <div class="section">
+    <h2 class="section-title">How good the pictures are</h2>
+
+    <!-- Q1 -->
+    <div class="question">
+      <p><strong>Q1.</strong> How clear will the pictures be with this kind of sensor?</p>
+      <p class="spec">What to check: Picture sensor type</p>
+      <div class="machine-notes">
+        <div><strong>About the machines (from documents):</strong></div>
+        <ul>
+          <li><strong>BullsEye:</strong> Amorphous Silicon Thin Film Transistor (TFT) detector with Cesium Iodide or Gadolinium Oxysulfide scintillator</li>
+          <li><strong>Aimed:</strong> Cesium Iodide Flat Panel Digital Detector</li>
+          <li><strong>GE:</strong> Cesium Iodide Wireless Digital Detector</li>
+        </ul>
+      </div>
+      <div class="ratings">
+        <div class="machine-rating">
+          <div class="machine-rating-title">BullsEye – SG Jumong + DRTECH</div>
+          <div class="scale-label">Choose a score (0 to 5):</div>
+          <div class="scale-options">
+            <label><input type="radio" name="q1_bullseye" value="0"> 0</label>
+            <label><input type="radio" name="q1_bullseye" value="1"> 1</label>
+            <label><input type="radio" name="q1_bullseye" value="2"> 2</label>
+            <label><input type="radio" name="q1_bullseye" value="3"> 3</label>
+            <label><input type="radio" name="q1_bullseye" value="4"> 4</label>
+            <label><input type="radio" name="q1_bullseye" value="5"> 5</label>
+          </div>
+        </div>
+        <div class="machine-rating">
+          <div class="machine-rating-title">Aimed – Carestream Horizon + Trimax</div>
+          <div class="scale-label">Choose a score (0 to 5):</div>
+          <div class="scale-options">
+            <label><input type="radio" name="q1_aimed" value="0"> 0</label>
+            <label><input type="radio" name="q1_aimed" value="1"> 1</label>
+            <label><input type="radio" name="q1_aimed" value="2"> 2</label>
+            <label><input type="radio" name="q1_aimed" value="3"> 3</label>
+            <label><input type="radio" name="q1_aimed" value="4"> 4</label>
+            <label><input type="radio" name="q1_aimed" value="5"> 5</label>
+          </div>
+        </div>
+        <div class="machine-rating">
+          <div class="machine-rating-title">GE – Definium Pace Select + FlashPad</div>
+          <div class="scale-label">Choose a score (0 to 5):</div>
+          <div class="scale-options">
+            <label><input type="radio" name="q1_ge" value="0"> 0</label>
+            <label><input type="radio" name="q1_ge" value="1"> 1</label>
+            <label><input type="radio" name="q1_ge" value="2"> 2</label>
+            <label><input type="radio" name="q1_ge" value="3"> 3</label>
+            <label><input type="radio" name="q1_ge" value="4"> 4</label>
+            <label><input type="radio" name="q1_ge" value="5"> 5</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question">
+      <p><strong>Q2.</strong> Are the tiny picture dots small (smaller is sharper)?</p>
+      <p class="spec">What to check: How small each picture dot is</p>
+      <div class="machine-notes">
+        <div><strong>About the machines (from documents):</strong></div>
+        <ul>
+          <li><strong>BullsEye:</strong> 140 micrometers</li>
+          <li><strong>Aimed:</strong> Approximately 150 micrometers</li>
+          <li><strong>GE:</strong> 150 micrometers</li>
+        </ul>
+      </div>
+      <div class="ratings">
+        <div class="machine-rating">
+          <div class="machine-rating-title">BullsEye – SG Jumong + DRTECH</div>
+          <div class="scale-label">Choose a score (0 to 5):</div>
+          <div class="scale-options">
+            <label><input type="radio" name="q2_bullseye" value="0"> 0</label>
+            <label><input type="radio" name="q2_bullseye" value="1"> 1</label>
+            <label><input type="radio" name="q2_bullseye" value="2"> 2</label>
+            <label><input type="radio" name="q2_bullseye" value="3"> 3</label>
+            <label><input type="radio" name="q2_bullseye" value="4"> 4</label>
+            <label><input type="radio" name="q2_bullseye" value="5"> 5</label>
+          </div>
+        </div>
+        <div class="machine-rating">
+          <div class="machine-rating-title">Aimed – Carestream Horizon + Trimax</div>
+          <div class="scale-label">Choose a score (0 to 5):</div>
+          <div class="scale-options">
+            <label><input type="radio" name="q2_aimed" value="0"> 0</label>
+            <label><input type="radio" name="q2_aimed" value="1"> 1</label>
+            <label><input type="radio" name="q2_aimed" value="2"> 2</label>
+            <label><input type="radio" name="q2_aimed" value="3"> 3</label>
+            <label><input type="radio" name="q2_aimed" value="4"> 4</label>
+            <label><input type="radio" name="q2_aimed" value="5"> 5</label>
+          </div>
+        </div>
+        <div class="machine-rating">
+          <div class="machine-rating-title">GE – Definium Pace Select + FlashPad</div>
+          <div class="scale-label">Choose a score (0 to 5):</div>
+          <div class="scale-options">
+            <label><input type="radio" name="q2_ge" value="0"> 0</label>
+            <label><input type="radio" name="q2_ge" value="1"> 1</label>
+            <label><input type="radio" name="q2_ge" value="2"> 2</label>
+            <label><input type="radio" name="q2_ge" value="3"> 3</label>
+            <label><input type="radio" name="q2_ge" value="4"> 4</label>
+            <label><input type="radio" name="q2_ge" value="5"> 5</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTE: Questions Q3–Q35 follow the same structure (question text, machine notes, and 0–5 ratings for each machine). -->
+  </div>
+
+  <div class="submit-row">
+    <button type="submit">Submit ratings</button>
+  </div>
+</form>
+</body>
+</html>
